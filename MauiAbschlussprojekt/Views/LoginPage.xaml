@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns = "http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x = "http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class = "MauiAbschlussprojekt.Views.LoginPage"
+             Title = "LoginPage" >
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <Label Text="Login"/>
+
+        <Entry Placeholder="E-Mail"
+               Text="{Binding Email}"/>
+
+        <Entry Placeholder="Passwort"
+               IsPassword="True"
+               Text="{Binding Password}"/>
+
+        <Label Text="{Binding ErrorMessage}"
+               TextColor="Red"/>
+
+        <Button Text="Anmelden"
+                Command="{Binding LoginCommand}"/>
+
+        <Button Text="Registrieren"
+                Command="{Binding NavigateToRegisterCommand}"/>
+
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                         IsVisible="{Binding IsLoading}"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

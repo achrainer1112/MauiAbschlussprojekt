@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiAbschlussprojekt.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="MauiAbschlussprojekt.Views.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Title="Registrierung">
+
+
+    <!-- In RegisterPage.xaml -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20">
+
+            <!-- Header -->
+            <Label Text="TrinkTracker"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,10"/>
+
+            <Label Text="Erstelle deinen Account"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+
+            <!-- Basis-Daten -->
+            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
+                <VerticalStackLayout Spacing="15" Padding="15">
+                    <Label Text="Account-Daten" FontAttributes="Bold" FontSize="18"/>
+
+                    <Entry Placeholder="Username"
+                           Text="{Binding Username}"/>
+
+                    <Entry Placeholder="Email"
+                           Keyboard="Email"
+                           Text="{Binding Email}"/>
+
+                    <Entry Placeholder="Passwort"
+                           IsPassword="True"
+                           Text="{Binding Password}"/>
+
+                    <Entry Placeholder="Passwort bestätigen"
+                           IsPassword="True"
+                           Text="{Binding ConfirmPassword}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Körperdaten (Optional) -->
+            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
+                <VerticalStackLayout Spacing="15" Padding="15">
+                    <Label Text="Körperdaten (optional)" FontAttributes="Bold" FontSize="18"/>
+                    <Label Text="Basierend auf deinem Gewicht und Aktivitätslevel berechnen wir dein Trinkziel."
+                           FontSize="12"
+                           TextColor="Gray"/>
+
+                    <Entry Placeholder="Körpergewicht in kg (z.B. 75)"
+                           Keyboard="Numeric"
+                           Text="{Binding WeightInput}"/>
+
+                    <Label Text="Aktivitätslevel"/>
+                    <Picker ItemsSource="{Binding ActivityLevels}"
+                            ItemDisplayBinding="{Binding Display}"
+                            SelectedItem="{Binding SelectedActivityLevel}"/>
+
+                    <Label Text="{Binding CalculatedGoalText}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#2196F3"
+                           IsVisible="{Binding ShowCalculatedGoal}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Custom Goal -->
+            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
+                <VerticalStackLayout Spacing="15" Padding="15">
+                    <HorizontalStackLayout Spacing="10">
+                        <CheckBox IsChecked="{Binding ShowCustomGoal}"/>
+                        <Label Text="Eigenes Tagesziel festlegen"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <Entry Placeholder="Eigenes Ziel in ml (z.B. 2500)"
+                           Keyboard="Numeric"
+                           Text="{Binding CustomGoalInput}"
+                           IsVisible="{Binding ShowCustomGoal}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding ErrorMessage.Length}"
+                   HorizontalOptions="Center"/>
+
+            <!-- Register Button -->
+            <Button Text="Registrieren"
+                    Command="{Binding RegisterCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="10"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                             IsVisible="{Binding IsLoading}"
+                             Color="#2196F3"/>
+
+            <!-- Login Link -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
+                <Label Text="Bereits registriert?"
+                       TextColor="Gray"/>
+                <Label Text="Zum Login"
+                       TextColor="#2196F3"
+                       TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

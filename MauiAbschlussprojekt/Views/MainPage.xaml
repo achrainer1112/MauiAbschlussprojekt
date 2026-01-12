@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MauiAbschlussprojekt.ViewModels"
+             xmlns:models="clr-namespace:Models;assembly=Models"
+             x:Class="MauiAbschlussprojekt.Views.MainPage"
+             x:DataType="viewmodels:MainViewModel"
+             Title="TrinkTracker">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="{Binding Username, StringFormat='Hallo, {0}!'}"
+                   FontSize="22"
+                   FontAttributes="Bold"/>
+
+            <!-- Progress -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="{Binding TotalMl, StringFormat='{0} ml von'}"
+                       FontSize="28"
+                       FontAttributes="Bold"/>
+                <Label Text="{Binding GoalMl, StringFormat='{0} ml Tagesziel'}"
+                       FontSize="16"/>
+                <ProgressBar Progress="{Binding ProgressPercentage}"
+                             HeightRequest="20"/>
+                <Label Text="{Binding ProgressText}"
+                       FontSize="14"/>
+            </VerticalStackLayout>
+
+            <!-- Quick Add Buttons -->
+            <Label Text="Schnell hinzufügen:"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   Margin="0,10,0,0"/>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="250ml"
+                        Command="{Binding QuickAddWaterCommand}">
+                    <Button.CommandParameter>
+                        <x:Int32>250</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Column="1"
+                        Text="500ml"
+                        Command="{Binding QuickAddWaterCommand}">
+                    <Button.CommandParameter>
+                        <x:Int32>500</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Column="2"
+                        Text="750ml"
+                        Command="{Binding QuickAddWaterCommand}">
+                    <Button.CommandParameter>
+                        <x:Int32>750</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Column="3"
+                        Text="1000ml"
+                        Command="{Binding QuickAddWaterCommand}">
+                    <Button.CommandParameter>
+                        <x:Int32>1000</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+            </Grid>
+
+            <!-- Custom Amount -->
+            <Label Text="Eigene Menge:"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   Margin="0,10,0,0"/>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Entry Grid.Column="0"
+                       Placeholder="Menge in ml"
+                       Text="{Binding CustomAmountInput}"
+                       Keyboard="Numeric"
+                       ReturnCommand="{Binding AddCustomAmountCommand}"/>
+                <Button Grid.Column="1"
+                        Text="OK"
+                        Command="{Binding AddCustomAmountCommand}"/>
+            </Grid>
+
+            <!-- Navigation -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                <Button Grid.Column="0"
+                        Text="Statistiken"
+                        Command="{Binding NavigateToStatsCommand}"/>
+                <Button Grid.Column="1"
+                        Text="Einstellungen"
+                        Command="{Binding NavigateToSettingsCommand}"/>
+                <Button Grid.Column="2"
+                        Text="Logout"
+                        Command="{Binding LogoutCommand}"/>
+            </Grid>
+
+            <!-- Today's Entries -->
+            <Label Text="Heutige Einträge:"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   Margin="0,15,0,0"/>
+
+            <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                        Command="{Binding LoadTodayDataCommand}">
+                <CollectionView ItemsSource="{Binding TodayEntries}">
+                    <CollectionView.EmptyView>
+                        <Label Text="Noch keine Einträge heute"
+                               HorizontalOptions="Center"
+                               Margin="0,20,0,0"/>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:WaterEntryDto">
+                            <Border Stroke="LightGray"
+                                    StrokeThickness="1"
+                                    Padding="10"
+                                    Margin="0,0,0,5">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label Text="{Binding AmountMl, StringFormat='{0} ml'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"/>
+                                        <Label Text="{Binding LoggedAt, StringFormat='{0:HH:mm} Uhr'}"
+                                               FontSize="12"/>
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="1"
+                                            Text="Bearbeiten"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=EditEntryCommand}"
+                                            CommandParameter="{Binding .}"/>
+
+                                    <Button Grid.Column="2"
+                                            Text="Löschen"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=DeleteEntryCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MauiAbschlussprojekt.ViewModels"
+             x:Class="MauiAbschlussprojekt.Views.SettingsPage"
+             x:DataType="viewmodels:SettingsViewModel"
+             Title="Einstellungen">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Benutzer-Einstellungen -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Benutzer-Einstellungen"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+
+                <Label Text="Gewicht (kg)"/>
+                <Entry Text="{Binding WeightInput}"
+                       Placeholder="z.B. 75"
+                       Keyboard="Numeric"/>
+
+                <Label Text="Aktivitätslevel"/>
+                <Picker ItemsSource="{Binding ActivityLevels}"
+                        ItemDisplayBinding="{Binding Display}"
+                        SelectedItem="{Binding SelectedActivityLevel}"/>
+
+                <Label Text="{Binding CalculatedGoalText}"
+                       IsVisible="{Binding ShowCalculatedGoal}"
+                       FontSize="12"/>
+
+                <Label Text="Eigenes Tagesziel (ml)" 
+                       Margin="0,10,0,0"/>
+                <Entry Text="{Binding CustomGoalInput}"
+                       Placeholder="Optional: Eigenes Ziel"
+                       Keyboard="Numeric"/>
+
+                <Button Text="Speichern"
+                        Command="{Binding SaveUserSettingsCommand}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+            </VerticalStackLayout>
+
+            <!-- Erinnerungen -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Erinnerungen"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+
+                <HorizontalStackLayout Spacing="10">
+                    <Label Text="Erinnerungen aktivieren"
+                           VerticalOptions="Center"/>
+                    <Switch IsToggled="{Binding ReminderEnabled}"/>
+                </HorizontalStackLayout>
+
+                <Label Text="Intervall (Minuten)"/>
+                <Picker ItemsSource="{Binding ReminderIntervals}"
+                        SelectedItem="{Binding SelectedReminderInterval}"
+                        IsEnabled="{Binding ReminderEnabled}"/>
+
+                <Label Text="Start-Uhrzeit (Stunde)"/>
+                <Stepper Value="{Binding ReminderStartHour}"
+                         Minimum="0"
+                         Maximum="23"
+                         Increment="1"
+                         IsEnabled="{Binding ReminderEnabled}"/>
+                <Label Text="{Binding ReminderStartHour, StringFormat='{0}:00 Uhr'}"
+                       FontSize="12"/>
+
+                <Label Text="End-Uhrzeit (Stunde)"/>
+                <Stepper Value="{Binding ReminderEndHour}"
+                         Minimum="0"
+                         Maximum="23"
+                         Increment="1"
+                         IsEnabled="{Binding ReminderEnabled}"/>
+                <Label Text="{Binding ReminderEndHour, StringFormat='{0}:00 Uhr'}"
+                       FontSize="12"/>
+
+                <Button Text="Erinnerungen speichern"
+                        Command="{Binding SaveReminderSettingsCommand}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+            </VerticalStackLayout>
+
+            <Button Text="Zurück"
+                    Command="{Binding BackCommand}"
+                    Margin="0,20,0,0"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

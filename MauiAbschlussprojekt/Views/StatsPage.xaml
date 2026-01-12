@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MauiAbschlussprojekt.ViewModels"
+             xmlns:models="clr-namespace:Models;assembly=Models"
+             x:Class="MauiAbschlussprojekt.Views.StatsPage"
+             x:DataType="viewmodels:StatsViewModel"
+             Title="Statistiken">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Streaks -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Streaks"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" Stroke="LightGray" StrokeThickness="1" Padding="15">
+                        <VerticalStackLayout>
+                            <Label Text="Aktueller Streak"
+                                   FontSize="12"/>
+                            <Label Text="{Binding CurrentStreak, StringFormat='{0} Tage'}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" Stroke="LightGray" StrokeThickness="1" Padding="15">
+                        <VerticalStackLayout>
+                            <Label Text="Bester Streak"
+                                   FontSize="12"/>
+                            <Label Text="{Binding BestStreak, StringFormat='{0} Tage'}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Border Stroke="LightGray" StrokeThickness="1" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Durchschnitt (7 Tage)"
+                               FontSize="12"/>
+                        <Label Text="{Binding AverageMl, StringFormat='{0} ml'}"
+                               FontSize="24"
+                               FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- 7-Tage-Übersicht -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Letzte 7 Tage"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+
+                <CollectionView ItemsSource="{Binding WeekStats}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:DailyStatsDto">
+                            <Border Stroke="LightGray"
+                                    StrokeThickness="1"
+                                    Padding="15"
+                                    Margin="0,0,0,5">
+                                <VerticalStackLayout Spacing="8">
+
+                                    <!-- Datum -->
+                                    <Label Text="{Binding Date, StringFormat='{0:dddd, dd.MM.yyyy}'}"
+                                           FontSize="14"
+                                           FontAttributes="Bold"/>
+
+                                    <!-- Menge -->
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="{Binding TotalMl, StringFormat='{0} ml'}"
+                                               FontSize="12"/>
+                                        <Label Text="von"
+                                               FontSize="12"/>
+                                        <Label Text="{Binding GoalMl, StringFormat='{0} ml'}"
+                                               FontSize="12"/>
+                                        <Label Text="{Binding Percentage, StringFormat='({0:F0}%)'}"
+                                               FontSize="12"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Progress Bar -->
+                                    <ProgressBar Progress="{Binding Percentage}"
+                                                 HeightRequest="8"/>
+
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <Button Text="Zurück"
+                    Command="{Binding BackCommand}"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
+    
+    
