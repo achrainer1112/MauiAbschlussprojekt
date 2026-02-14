@@ -3,6 +3,7 @@ using MauiAbschlussprojekt.Services;
 using MauiAbschlussprojekt.ViewModels;
 using MauiAbschlussprojekt.Views;
 using Microsoft.Extensions.Logging;
+using Plugin.LocalNotification;
 
 namespace MauiAbschlussprojekt
 {
@@ -15,6 +16,9 @@ namespace MauiAbschlussprojekt
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+#if ANDROID || IOS
+                .UseLocalNotification()
+#endif
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -23,7 +27,7 @@ namespace MauiAbschlussprojekt
 
             // Services
             builder.Services.AddSingleton<ApiService>();
-            builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IReminderService, ReminderService>();
 
             // Views
             builder.Services.AddTransient<LoginPage>();

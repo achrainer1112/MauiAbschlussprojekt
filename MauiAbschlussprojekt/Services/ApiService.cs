@@ -8,7 +8,19 @@ namespace MauiAbschlussprojekt.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "http://localhost:5287/api";
+        private static string BaseUrl
+        {
+            get
+            {
+#if ANDROID
+                // Android Emulator: 10.0.2.2 = Host-PC
+                return "http://10.0.2.2:5287/api";
+#else
+                // Windows/iOS: localhost
+                return "http://localhost:5287/api";
+#endif
+            }
+        }
 
         public string? Token { get; set; }
         public int? CurrentUserId { get; set; }

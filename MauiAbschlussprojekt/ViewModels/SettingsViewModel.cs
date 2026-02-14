@@ -9,7 +9,7 @@ namespace MauiAbschlussprojekt.ViewModels
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
-        private readonly INotificationService _notificationService;
+        private readonly IReminderService _reminderService;
 
         [ObservableProperty]
         private string weightInput = string.Empty;
@@ -30,7 +30,7 @@ namespace MauiAbschlussprojekt.ViewModels
         private bool reminderEnabled;
 
         [ObservableProperty]
-        private int selectedReminderInterval;
+        private string reminderIntervalInput = "60";
 
         [ObservableProperty]
         private int reminderStartHour = 8;
@@ -42,12 +42,11 @@ namespace MauiAbschlussprojekt.ViewModels
         private bool isLoading;
 
         public ObservableCollection<ActivityLevelItem> ActivityLevels { get; }
-        public ObservableCollection<int> ReminderIntervals { get; }
 
-        public SettingsViewModel(ApiService apiService, INotificationService notificationService)
+        public SettingsViewModel(ApiService apiService, IReminderService reminderService)
         {
             _apiService = apiService;
-            _notificationService = notificationService;
+            _reminderService = reminderService;
 
             ActivityLevels = new ObservableCollection<ActivityLevelItem>
             {
@@ -56,10 +55,7 @@ namespace MauiAbschlussprojekt.ViewModels
                 new ActivityLevelItem { Value = "high", Display = "Hoch" }
             };
 
-            ReminderIntervals = new ObservableCollection<int> { 30, 60, 90, 120, 180 };
-
             selectedActivityLevel = ActivityLevels[1]; // Default: medium
-            selectedReminderInterval = 60;
         }
 
         public async Task InitializeAsync()
@@ -68,9 +64,9 @@ namespace MauiAbschlussprojekt.ViewModels
             if (user != null)
             {
                 WeightInput = user.WeightKg?.ToString() ?? string.Empty;
-                CustomGoalInput = user.DailyWaterGoalMl?.ToString() ?? string.Empty;
+                CustomGoalInput = string.Empty;
                 ReminderEnabled = user.ReminderEnabled;
-                SelectedReminderInterval = user.ReminderIntervalMinutes;
+                ReminderIntervalInput = user.ReminderIntervalMinutes.ToString();
                 ReminderStartHour = user.ReminderStartHour;
                 ReminderEndHour = user.ReminderEndHour;
 
@@ -86,8 +82,8 @@ namespace MauiAbschlussprojekt.ViewModels
                 // Starte Notifications falls aktiviert
                 if (ReminderEnabled)
                 {
-                    _notificationService.StartPeriodicNotifications(
-                        SelectedReminderInterval,
+                    _reminderService.StartPeriodicNotifications(
+                        user.ReminderIntervalMinutes,
                         ReminderStartHour,
                         ReminderEndHour
                     );
@@ -116,7 +112,7 @@ namespace MauiAbschlussprojekt.ViewModels
                     _ => 35
                 };
                 int goal = (int)(weight * multiplier);
-                CalculatedGoalText = $"Empfohlung: {goal} ml";
+                CalculatedGoalText = $"Empfohlen: {goal} ml";
                 ShowCalculatedGoal = true;
             }
             else
@@ -173,10 +169,18 @@ namespace MauiAbschlussprojekt.ViewModels
 
             try
             {
+                // Validiere Intervall
+                if (!int.TryParse(ReminderIntervalInput, out int intervalMinutes) || intervalMinutes <= 0)
+                {
+                    await Shell.Current.DisplayAlert("Fehler", "Bitte ein gültiges Intervall eingeben (Minuten > 0)", "OK");
+                    IsLoading = false;
+                    return;
+                }
+
                 // Berechtigung prüfen falls noch nicht vorhanden
                 if (ReminderEnabled)
                 {
-                    bool hasPermission = await _notificationService.RequestPermissionAsync();
+                    bool hasPermission = await _reminderService.RequestPermissionAsync();
                     if (!hasPermission)
                     {
                         await Shell.Current.DisplayAlert("Berechtigung fehlt",
@@ -190,7 +194,7 @@ namespace MauiAbschlussprojekt.ViewModels
                 var request = new UpdateReminderRequest
                 {
                     ReminderEnabled = ReminderEnabled,
-                    ReminderIntervalMinutes = SelectedReminderInterval,
+                    ReminderIntervalMinutes = intervalMinutes,
                     ReminderStartHour = ReminderStartHour,
                     ReminderEndHour = ReminderEndHour
                 };
@@ -202,15 +206,15 @@ namespace MauiAbschlussprojekt.ViewModels
                     // Notifications starten/stoppen
                     if (ReminderEnabled)
                     {
-                        _notificationService.StartPeriodicNotifications(
-                            SelectedReminderInterval,
+                        _reminderService.StartPeriodicNotifications(
+                            intervalMinutes,
                             ReminderStartHour,
                             ReminderEndHour
                         );
                     }
                     else
                     {
-                        _notificationService.StopPeriodicNotifications();
+                        _reminderService.StopPeriodicNotifications();
                     }
 
                     await Shell.Current.DisplayAlert("Erfolg", "Erinnerungen gespeichert", "OK");
