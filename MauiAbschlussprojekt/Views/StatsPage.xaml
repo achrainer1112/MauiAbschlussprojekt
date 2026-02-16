@@ -81,8 +81,8 @@
                                                FontSize="12"/>
                                     </HorizontalStackLayout>
 
-                                    <!-- Progress Bar -->
-                                    <ProgressBar Progress="{Binding Percentage}"
+                                    <!-- Progress Bar: braucht Wert zwischen 0 und 1 -->
+                                    <ProgressBar Progress="{Binding ProgressValue}"
                                                  HeightRequest="8"/>
 
                                 </VerticalStackLayout>
@@ -99,5 +99,3 @@
     </ScrollView>
 
 </ContentPage>
-    
-    

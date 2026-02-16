@@ -98,7 +98,9 @@ namespace Models
         public int GoalMl { get; set; }
         public double Percentage { get; set; }
         public bool GoalReached { get; set; }
+        public double ProgressValue => Percentage / 100.0;
     }
+
 
     public class WeekStatsDto
     {

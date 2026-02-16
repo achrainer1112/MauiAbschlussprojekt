@@ -46,7 +46,9 @@ namespace MauiAbschlussprojekt.ViewModels
                 if (stats != null)
                 {
                     WeekStats.Clear();
-                    foreach (var day in stats.Days)
+
+                    // Umgekehrte Reihenfolge: neuester Tag zuerst
+                    foreach (var day in stats.Days.OrderByDescending(d => d.Date))
                     {
                         WeekStats.Add(day);
                     }
