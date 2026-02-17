@@ -45,6 +45,8 @@ namespace Models
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+
+        // Water Tracker Settings
         public double? WeightKg { get; set; }
         public string? ActivityLevel { get; set; }
         public int? DailyWaterGoalMl { get; set; }
@@ -52,6 +54,15 @@ namespace Models
         public int ReminderIntervalMinutes { get; set; }
         public int ReminderStartHour { get; set; }
         public int ReminderEndHour { get; set; }
+
+        // Sleep Tracker Settings
+        public double TargetSleepHours { get; set; }
+        public int TargetBedTimeHour { get; set; }
+        public int TargetBedTimeMinute { get; set; }
+        public int TargetWakeTimeHour { get; set; }
+        public int TargetWakeTimeMinute { get; set; }
+        public double? WeekendTargetSleepHours { get; set; }
+        public bool SleepReminderEnabled { get; set; }
     }
 
     public class UpdateUserRequest
@@ -98,9 +109,7 @@ namespace Models
         public int GoalMl { get; set; }
         public double Percentage { get; set; }
         public bool GoalReached { get; set; }
-        public double ProgressValue => Percentage / 100.0;
     }
-
 
     public class WeekStatsDto
     {

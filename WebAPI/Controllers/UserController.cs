@@ -3,7 +3,6 @@ using ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace WebAPI.Controllers
 {
     [ApiController]
@@ -26,20 +25,7 @@ namespace WebAPI.Controllers
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
-            return Ok(new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                WeightKg = user.WeightKg,
-                ActivityLevel = user.ActivityLevel,
-                DailyWaterGoalMl = user.DailyWaterGoalMl,
-                ReminderEnabled = user.ReminderEnabled,
-                ReminderIntervalMinutes = user.ReminderIntervalMinutes,
-                ReminderStartHour = user.ReminderStartHour,
-                ReminderEndHour = user.ReminderEndHour
-            });
+            return Ok(MapToUserDto(user));
         }
 
         // PUT: api/user/update
@@ -78,20 +64,7 @@ namespace WebAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                WeightKg = user.WeightKg,
-                ActivityLevel = user.ActivityLevel,
-                DailyWaterGoalMl = user.DailyWaterGoalMl,
-                ReminderEnabled = user.ReminderEnabled,
-                ReminderIntervalMinutes = user.ReminderIntervalMinutes,
-                ReminderStartHour = user.ReminderStartHour,
-                ReminderEndHour = user.ReminderEndHour
-            });
+            return Ok(MapToUserDto(user));
         }
 
         // PUT: api/user/reminder-settings
@@ -116,7 +89,47 @@ namespace WebAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(new UserDto
+            return Ok(MapToUserDto(user));
+        }
+
+        // PUT: api/user/sleep-settings
+        [HttpPut("sleep-settings")]
+        public async Task<ActionResult<UserDto>> UpdateSleepSettings([FromBody] UpdateSleepSettingsRequest request, [FromQuery] int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return NotFound(new { message = "User nicht gefunden" });
+
+            if (request.TargetSleepHours.HasValue)
+                user.TargetSleepHours = request.TargetSleepHours.Value;
+
+            if (request.TargetBedTimeHour.HasValue)
+                user.TargetBedTimeHour = request.TargetBedTimeHour.Value;
+
+            if (request.TargetBedTimeMinute.HasValue)
+                user.TargetBedTimeMinute = request.TargetBedTimeMinute.Value;
+
+            if (request.TargetWakeTimeHour.HasValue)
+                user.TargetWakeTimeHour = request.TargetWakeTimeHour.Value;
+
+            if (request.TargetWakeTimeMinute.HasValue)
+                user.TargetWakeTimeMinute = request.TargetWakeTimeMinute.Value;
+
+            if (request.WeekendTargetSleepHours.HasValue)
+                user.WeekendTargetSleepHours = request.WeekendTargetSleepHours.Value;
+
+            if (request.SleepReminderEnabled.HasValue)
+                user.SleepReminderEnabled = request.SleepReminderEnabled.Value;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(MapToUserDto(user));
+        }
+
+        private UserDto MapToUserDto(User user)
+        {
+            return new UserDto
             {
                 Id = user.Id,
                 Username = user.Username,
@@ -128,66 +141,15 @@ namespace WebAPI.Controllers
                 ReminderEnabled = user.ReminderEnabled,
                 ReminderIntervalMinutes = user.ReminderIntervalMinutes,
                 ReminderStartHour = user.ReminderStartHour,
-                ReminderEndHour = user.ReminderEndHour
-            });
+                ReminderEndHour = user.ReminderEndHour,
+                TargetSleepHours = user.TargetSleepHours,
+                TargetBedTimeHour = user.TargetBedTimeHour,
+                TargetBedTimeMinute = user.TargetBedTimeMinute,
+                TargetWakeTimeHour = user.TargetWakeTimeHour,
+                TargetWakeTimeMinute = user.TargetWakeTimeMinute,
+                WeekendTargetSleepHours = user.WeekendTargetSleepHours,
+                SleepReminderEnabled = user.SleepReminderEnabled
+            };
         }
-    }
-}
-
-// DTOs für User-Updates (zu DTOs.cs hinzufügen)
-namespace Models
-{
-    public class UpdateUserRequest
-    {
-        public double? WeightKg { get; set; }
-        public string? ActivityLevel { get; set; }
-        public int? DailyWaterGoalMl { get; set; }
-    }
-
-    public class UpdateReminderRequest
-    {
-        public bool ReminderEnabled { get; set; }
-        public int? ReminderIntervalMinutes { get; set; }
-        public int? ReminderStartHour { get; set; }
-        public int? ReminderEndHour { get; set; }
-    }
-
-    public class WaterEntryDto
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public int AmountMl { get; set; }
-        public DateTime LoggedAt { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class AddWaterRequest
-    {
-        public int AmountMl { get; set; }
-        public DateTime? LoggedAt { get; set; }
-    }
-
-    public class UpdateWaterEntryRequest
-    {
-        public int Id { get; set; }
-        public int AmountMl { get; set; }
-        public DateTime? LoggedAt { get; set; }
-    }
-
-    public class DailyStatsDto
-    {
-        public DateTime Date { get; set; }
-        public int TotalMl { get; set; }
-        public int GoalMl { get; set; }
-        public double Percentage { get; set; }
-        public bool GoalReached { get; set; }
-    }
-
-    public class WeekStatsDto
-    {
-        public List<DailyStatsDto> Days { get; set; } = new();
-        public int AverageMl { get; set; }
-        public int CurrentStreak { get; set; }
-        public int BestStreak { get; set; }
     }
 }

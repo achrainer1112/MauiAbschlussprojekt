@@ -2,11 +2,11 @@ using MauiAbschlussprojekt.ViewModels;
 
 namespace MauiAbschlussprojekt.Views
 {
-    public partial class MainPage : ContentPage
+    public partial class SleepTrackerPage : ContentPage
     {
-        private readonly MainViewModel _viewModel;
+        private readonly SleepTrackerViewModel _viewModel;
 
-        public MainPage(MainViewModel viewModel)
+        public SleepTrackerPage(SleepTrackerViewModel viewModel)
         {
             InitializeComponent();
             _viewModel = viewModel;

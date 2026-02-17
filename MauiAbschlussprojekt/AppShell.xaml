@@ -4,35 +4,81 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:MauiAbschlussprojekt.Views"
-    Shell.FlyoutBehavior="Disabled">
+    Shell.FlyoutBehavior="Flyout"
+    FlyoutBackgroundColor="#2C3E50">
 
-    <!-- Login Page -->
-    <ShellContent
-        Title="Login"
-        Route="LoginPage"
-        ContentTemplate="{DataTemplate views:LoginPage}" />
+    <!-- Flyout Header -->
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="#34495E" 
+              Padding="20"
+              HeightRequest="150">
+            <VerticalStackLayout VerticalOptions="Center" Spacing="10">
+                <Label Text="💧😴 HealthTracker"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Dein Gesundheits-Assistent"
+                       FontSize="14"
+                       TextColor="White"
+                       Opacity="0.8"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
 
-    <!-- Register Page -->
-    <ShellContent
-        Title="Register"
-        Route="RegisterPage"
-        ContentTemplate="{DataTemplate views:RegisterPage}" />
+    <!-- Flyout Items (Hauptmenü) -->
+    <FlyoutItem Title="Wasser-Tracker" 
+                Icon="drop.png"
+                Route="WaterTracker">
+        <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
+    </FlyoutItem>
 
-    <!-- Main Page -->
-    <ShellContent
-        Title="Home"
-        Route="MainPage"
-        ContentTemplate="{DataTemplate views:MainPage}" />
+    <FlyoutItem Title="Schlaf-Tracker" 
+                Icon="moon.png"
+                Route="SleepTracker">
+        <ShellContent ContentTemplate="{DataTemplate views:SleepTrackerPage}" />
+    </FlyoutItem>
 
-    <!-- Settings Page -->
-    <ShellContent
-        Title="Settings"
-        Route="SettingsPage"
-        ContentTemplate="{DataTemplate views:SettingsPage}" />
+    <FlyoutItem Title="Einstellungen" 
+                Icon="settings.png"
+                Route="Settings">
+        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
+    </FlyoutItem>
 
-    <!-- Stats Page -->
-    <ShellContent
-        Title="Stats"
-        Route="StatsPage"
-        ContentTemplate="{DataTemplate views:StatsPage}" />
+    <!-- Flyout Footer -->
+    <Shell.FlyoutFooter>
+        <Grid BackgroundColor="#1A252F" 
+              Padding="20,10"
+              HeightRequest="60">
+            <Label Text="Version 1.0"
+                   FontSize="12"
+                   TextColor="White"
+                   Opacity="0.6"
+                   VerticalOptions="Center"/>
+        </Grid>
+    </Shell.FlyoutFooter>
+
+    <!-- Flyout Styling -->
+    <Shell.FlyoutHeaderTemplate>
+        <DataTemplate>
+            <Grid BackgroundColor="#34495E" 
+                  Padding="20"
+                  HeightRequest="150">
+                <VerticalStackLayout VerticalOptions="Center" Spacing="10">
+                    <Label Text="💧😴 HealthTracker"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Dein Gesundheits-Assistent"
+                           FontSize="14"
+                           TextColor="White"
+                           Opacity="0.8"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+        </DataTemplate>
+    </Shell.FlyoutHeaderTemplate>
+
 </Shell>

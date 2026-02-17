@@ -31,6 +31,7 @@ namespace Models
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
+        // Water Tracker Settings
         [Column("weight_kg")]
         public double? WeightKg { get; set; }
 
@@ -53,7 +54,30 @@ namespace Models
         [Column("reminder_end_hour")]
         public int ReminderEndHour { get; set; } = 22;
 
-        // Navigation Property - das hat gefehlt!
+        // Sleep Tracker Settings
+        [Column("target_sleep_hours")]
+        public double TargetSleepHours { get; set; } = 8.0;
+
+        [Column("target_bed_time_hour")]
+        public int TargetBedTimeHour { get; set; } = 23;
+
+        [Column("target_bed_time_minute")]
+        public int TargetBedTimeMinute { get; set; } = 0;
+
+        [Column("target_wake_time_hour")]
+        public int TargetWakeTimeHour { get; set; } = 7;
+
+        [Column("target_wake_time_minute")]
+        public int TargetWakeTimeMinute { get; set; } = 0;
+
+        [Column("weekend_target_sleep_hours")]
+        public double? WeekendTargetSleepHours { get; set; }
+
+        [Column("sleep_reminder_enabled")]
+        public bool SleepReminderEnabled { get; set; } = false;
+
+        // Navigation Properties
         public ICollection<WaterEntry> WaterEntries { get; set; } = new List<WaterEntry>();
+        public ICollection<SleepEntry> SleepEntries { get; set; } = new List<SleepEntry>();
     }
 }

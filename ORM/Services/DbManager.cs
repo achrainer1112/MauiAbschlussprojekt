@@ -7,6 +7,7 @@ namespace ORM
     {
         public DbSet<User> Users { get; set; }
         public DbSet<WaterEntry> WaterEntries { get; set; }
+        public DbSet<SleepEntry> SleepEntries { get; set; }
 
         // Constructor für Dependency Injection (WebAPI)
         public DbManager(DbContextOptions<DbManager> options) : base(options)
@@ -50,6 +51,17 @@ namespace ORM
             // WaterEntry: Index für bessere Performance
             modelBuilder.Entity<WaterEntry>()
                 .HasIndex(w => new { w.UserId, w.LoggedAt });
+
+            // SleepEntry: Relationship
+            modelBuilder.Entity<SleepEntry>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.SleepEntries)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // SleepEntry: Index für bessere Performance
+            modelBuilder.Entity<SleepEntry>()
+                .HasIndex(s => new { s.UserId, s.BedTime });
         }
     }
 }

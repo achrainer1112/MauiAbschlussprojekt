@@ -22,6 +22,61 @@ namespace ORM.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Models.SleepEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BedTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("bed_time");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DreamMood")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("dream_mood");
+
+                    b.Property<string>("DreamText")
+                        .HasColumnType("longtext")
+                        .HasColumnName("dream_text");
+
+                    b.Property<string>("FallAsleepDurationCategory")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("fall_asleep_duration_category");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext")
+                        .HasColumnName("notes");
+
+                    b.Property<int>("SleepQuality")
+                        .HasColumnType("int")
+                        .HasColumnName("sleep_quality");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.Property<DateTime>("WakeTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("wake_time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "BedTime");
+
+                    b.ToTable("sleep_entries");
+                });
+
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -75,11 +130,39 @@ namespace ORM.Migrations
                         .HasColumnType("int")
                         .HasColumnName("reminder_start_hour");
 
+                    b.Property<bool>("SleepReminderEnabled")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("sleep_reminder_enabled");
+
+                    b.Property<int>("TargetBedTimeHour")
+                        .HasColumnType("int")
+                        .HasColumnName("target_bed_time_hour");
+
+                    b.Property<int>("TargetBedTimeMinute")
+                        .HasColumnType("int")
+                        .HasColumnName("target_bed_time_minute");
+
+                    b.Property<double>("TargetSleepHours")
+                        .HasColumnType("double")
+                        .HasColumnName("target_sleep_hours");
+
+                    b.Property<int>("TargetWakeTimeHour")
+                        .HasColumnType("int")
+                        .HasColumnName("target_wake_time_hour");
+
+                    b.Property<int>("TargetWakeTimeMinute")
+                        .HasColumnType("int")
+                        .HasColumnName("target_wake_time_minute");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("username");
+
+                    b.Property<double?>("WeekendTargetSleepHours")
+                        .HasColumnType("double")
+                        .HasColumnName("weekend_target_sleep_hours");
 
                     b.Property<double?>("WeightKg")
                         .HasColumnType("double")
@@ -128,6 +211,17 @@ namespace ORM.Migrations
                     b.ToTable("water_entries");
                 });
 
+            modelBuilder.Entity("Models.SleepEntry", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithMany("SleepEntries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.WaterEntry", b =>
                 {
                     b.HasOne("Models.User", "User")
@@ -141,6 +235,8 @@ namespace ORM.Migrations
 
             modelBuilder.Entity("Models.User", b =>
                 {
+                    b.Navigation("SleepEntries");
+
                     b.Navigation("WaterEntries");
                 });
 #pragma warning restore 612, 618

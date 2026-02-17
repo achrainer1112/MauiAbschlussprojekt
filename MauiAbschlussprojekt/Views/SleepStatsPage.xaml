@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MauiAbschlussprojekt.ViewModels"
+             x:Class="MauiAbschlussprojekt.Views.SleepStatsPage"
+             x:DataType="viewmodels:SleepStatsViewModel"
+             Title="Schlaf-Statistiken">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <LinearGradientBrush x:Key="HeaderGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#34495E" Offset="0.0" />
+                <GradientStop Color="#9B59B6" Offset="1.0" />
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="0" Spacing="0">
+
+            <!-- Header with Gradient -->
+            <Border Background="{StaticResource HeaderGradient}"
+                    Padding="20,30,20,20"
+                    StrokeThickness="0">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.3" Radius="10" Offset="0,5" />
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="📊 Deine Schlaf-Stats"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+
+                    <!-- Key Metrics Grid -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                        <!-- Average Sleep -->
+                        <Border Grid.Column="0" Grid.Row="0"
+                                StrokeThickness="0"
+                                BackgroundColor="White"
+                                Padding="15"
+                                Opacity="0.95">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout>
+                                <Label Text="Durchschnitt"
+                                       FontSize="12"
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding AverageSleepHours, StringFormat='{0:F1}h'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="#3498DB"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Current Streak -->
+                        <Border Grid.Column="1" Grid.Row="0"
+                                StrokeThickness="0"
+                                BackgroundColor="White"
+                                Padding="15"
+                                Opacity="0.95">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout>
+                                <Label Text="Aktueller Streak"
+                                       FontSize="12"
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding CurrentStreak, StringFormat='🔥 {0} Tage'}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#E74C3C"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Quality Score -->
+                        <Border Grid.Column="0" Grid.Row="1"
+                                StrokeThickness="0"
+                                BackgroundColor="White"
+                                Padding="15"
+                                Opacity="0.95">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout>
+                                <Label Text="Qualität"
+                                       FontSize="12"
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding AverageSleepQuality, StringFormat='⭐ {0:F1}/5'}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#F39C12"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Consistency -->
+                        <Border Grid.Column="1" Grid.Row="1"
+                                StrokeThickness="0"
+                                BackgroundColor="White"
+                                Padding="15"
+                                Opacity="0.95">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout>
+                                <Label Text="Regelmäßigkeit"
+                                       FontSize="12"
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding ConsistencyScore, StringFormat='{0}%'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="#27AE60"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Main Content -->
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Weekly Overview -->
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="📅 Letzte 7 Tage"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center"
+                               HorizontalOptions="StartAndExpand"/>
+                        <Label Text="{Binding GoalMetDays, StringFormat='{0}/7 Ziel erreicht'}"
+                               FontSize="12"
+                               TextColor="Gray"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <CollectionView ItemsSource="{Binding WeekStats}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeThickness="0"
+                                        BackgroundColor="#F8F9FA"
+                                        Padding="15"
+                                        Margin="0,0,0,8">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black" Opacity="0.1" Radius="5" Offset="0,2" />
+                                    </Border.Shadow>
+
+                                    <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="15">
+                                        <!-- Day Badge -->
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="{Binding Date, StringFormat='{0:ddd}'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="Gray"/>
+                                            <Label Text="{Binding Date, StringFormat='{0:dd}'}"
+                                                   FontSize="20"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Details -->
+                                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                            <HorizontalStackLayout Spacing="5">
+                                                <Label Text="{Binding TotalSleepHours, StringFormat='{0:F1}h'}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"/>
+                                                <Label Text="von"
+                                                       FontSize="12"
+                                                       TextColor="Gray"/>
+                                                <Label Text="{Binding TargetSleepHours, StringFormat='{0:F1}h'}"
+                                                       FontSize="14"
+                                                       TextColor="Gray"/>
+                                            </HorizontalStackLayout>
+
+                                            <!-- Visual indicator via BoxView -->
+                                            <Grid HeightRequest="8" BackgroundColor="#E0E0E0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <BoxView BackgroundColor="#3498DB" 
+                                                        WidthRequest="100"
+                                                        HorizontalOptions="Start"/>
+                                            </Grid>
+
+                                            <Label Text="{Binding GoalMet, StringFormat='Ziel: {0}'}" 
+                                                   FontSize="11" 
+                                                   TextColor="Gray"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Quality -->
+                                        <Label Grid.Column="2" 
+                                               Text="{Binding SleepQuality, StringFormat='⭐ {0}'}"
+                                               FontSize="14"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Additional Stats -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <!-- Best Streak -->
+                    <Border Grid.Column="0" 
+                            StrokeThickness="1"
+                            Stroke="LightGray"
+                            Padding="15">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout>
+                            <Label Text="🏆 Bester Streak"
+                                   FontSize="12"
+                                   TextColor="Gray"/>
+                            <Label Text="{Binding BestStreak, StringFormat='{0} Tage'}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="#F39C12"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Avg Fall Asleep -->
+                    <Border Grid.Column="1"
+                            StrokeThickness="1"
+                            Stroke="LightGray"
+                            Padding="15">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout>
+                            <Label Text="⏱️ Einschlafdauer"
+                                   FontSize="12"
+                                   TextColor="Gray"/>
+                            <Label Text="{Binding AverageFallAsleepMinutes, StringFormat='~{0:F0} Min'}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="#9B59B6"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Dream Stats -->
+                <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="💭 Traum-Statistiken"
+                               FontSize="18"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="{Binding TotalDreams, StringFormat='Gesamt: {0} Träume'}"
+                               FontSize="14"/>
+
+                        <CollectionView ItemsSource="{Binding DreamMoodStats}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <HorizontalStackLayout Spacing="10" Padding="5">
+                                        <Label Text="{Binding DisplayText}"
+                                               FontSize="14"/>
+                                    </HorizontalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Button Text="← Zurück"
+                        Command="{Binding BackCommand}"
+                        BackgroundColor="#95A5A6"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Margin="0,10,0,0"/>
+
+            </VerticalStackLayout>
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                             IsVisible="{Binding IsLoading}"
+                             Color="#9B59B6"
+                             Margin="20"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

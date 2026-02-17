@@ -78,8 +78,11 @@ namespace MauiAbschlussprojekt.ViewModels
         }
 
         [RelayCommand]
-        private async Task QuickAddWaterAsync(int amountMl)
+        private async Task QuickAddWaterAsync(string amountStr)
         {
+            if (!int.TryParse(amountStr, out int amountMl))
+                return;
+
             try
             {
                 var request = new AddWaterRequest
@@ -115,7 +118,7 @@ namespace MauiAbschlussprojekt.ViewModels
                 return;
             }
 
-            await QuickAddWaterAsync(amount);
+            await QuickAddWaterAsync(amount.ToString());
             CustomAmountInput = string.Empty;
         }
 
@@ -184,7 +187,6 @@ namespace MauiAbschlussprojekt.ViewModels
                     TotalMl = TotalMl - oldAmount + newAmount;
                     UpdateProgress();
 
-                    // UI-Update erzwingen
                     var index = TodayEntries.IndexOf(entry);
                     if (index >= 0)
                     {
@@ -208,20 +210,7 @@ namespace MauiAbschlussprojekt.ViewModels
         [RelayCommand]
         private async Task NavigateToStatsAsync()
         {
-            await Shell.Current.GoToAsync("//StatsPage");
-        }
-
-        [RelayCommand]
-        private async Task NavigateToSettingsAsync()
-        {
-            await Shell.Current.GoToAsync("//SettingsPage");
-        }
-
-        [RelayCommand]
-        private async Task LogoutAsync()
-        {
-            _apiService.Logout();
-            await Shell.Current.GoToAsync("//LoginPage");
+            await Shell.Current.GoToAsync("StatsPage");
         }
     }
 }
