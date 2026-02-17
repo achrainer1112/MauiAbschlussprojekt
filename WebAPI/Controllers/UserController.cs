@@ -37,21 +37,18 @@ namespace WebAPI.Controllers
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
-            // Update Gewicht und Aktivitätslevel
             if (request.WeightKg.HasValue)
                 user.WeightKg = request.WeightKg;
 
             if (!string.IsNullOrEmpty(request.ActivityLevel))
                 user.ActivityLevel = request.ActivityLevel;
 
-            // Update Wasserziel
             if (request.DailyWaterGoalMl.HasValue)
             {
                 user.DailyWaterGoalMl = request.DailyWaterGoalMl;
             }
             else if (request.WeightKg.HasValue && !string.IsNullOrEmpty(request.ActivityLevel))
             {
-                // Automatische Berechnung wenn kein Custom Goal angegeben
                 double multiplier = request.ActivityLevel switch
                 {
                     "low" => 30,
@@ -116,9 +113,6 @@ namespace WebAPI.Controllers
             if (request.TargetWakeTimeMinute.HasValue)
                 user.TargetWakeTimeMinute = request.TargetWakeTimeMinute.Value;
 
-            if (request.WeekendTargetSleepHours.HasValue)
-                user.WeekendTargetSleepHours = request.WeekendTargetSleepHours.Value;
-
             if (request.SleepReminderEnabled.HasValue)
                 user.SleepReminderEnabled = request.SleepReminderEnabled.Value;
 
@@ -147,7 +141,6 @@ namespace WebAPI.Controllers
                 TargetBedTimeMinute = user.TargetBedTimeMinute,
                 TargetWakeTimeHour = user.TargetWakeTimeHour,
                 TargetWakeTimeMinute = user.TargetWakeTimeMinute,
-                WeekendTargetSleepHours = user.WeekendTargetSleepHours,
                 SleepReminderEnabled = user.SleepReminderEnabled
             };
         }

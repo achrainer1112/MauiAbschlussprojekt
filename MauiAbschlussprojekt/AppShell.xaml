@@ -38,21 +38,21 @@
 
     <!-- Flyout Items (Hauptmenü) -->
     <FlyoutItem Title="Wasser-Tracker"
-                Icon="drop.png"
-                Route="WaterTracker">
-        <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
+                Icon="drop.png">
+        <ShellContent Route="WaterTracker"
+                      ContentTemplate="{DataTemplate views:MainPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Schlaf-Tracker"
-                Icon="moon.png"
-                Route="SleepTracker">
-        <ShellContent ContentTemplate="{DataTemplate views:SleepTrackerPage}" />
+                Icon="moon.png">
+        <ShellContent Route="SleepTracker"
+                      ContentTemplate="{DataTemplate views:SleepTrackerPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Einstellungen"
-                Icon="settings.png"
-                Route="Settings">
-        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
+                Icon="settings.png">
+        <ShellContent Route="Settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}" />
     </FlyoutItem>
 
     <!-- Flyout Footer -->

@@ -11,62 +11,50 @@ namespace MauiAbschlussprojekt.ViewModels
         private readonly SleepApiService _sleepApiService;
         private readonly IReminderService _reminderService;
 
-        [ObservableProperty]
-        private string weightInput = string.Empty;
+        // ── Wasser ──────────────────────────────────────────────────────────
+        [ObservableProperty] private string weightInput = string.Empty;
+        [ObservableProperty] private string customGoalInput = string.Empty;
+        [ObservableProperty] private ActivityLevelOption? selectedActivityLevel;
+        [ObservableProperty] private bool showCalculatedGoal;
+        [ObservableProperty] private string calculatedGoalText = string.Empty;
 
-        [ObservableProperty]
-        private string customGoalInput = string.Empty;
+        // ── Wasser-Erinnerungen ──────────────────────────────────────────────
+        [ObservableProperty] private bool reminderEnabled;
+        [ObservableProperty] private string reminderIntervalInput = string.Empty;
+        [ObservableProperty] private int reminderStartHour = 8;
+        [ObservableProperty] private int reminderEndHour = 22;
 
-        [ObservableProperty]
-        private ActivityLevelOption? selectedActivityLevel;
+        // ── Schlaf ───────────────────────────────────────────────────────────
+        [ObservableProperty] private string targetSleepHoursInput = "8";
+        [ObservableProperty] private int targetBedTimeHour = 23;
+        [ObservableProperty] private int targetBedTimeMinute = 0;
+        [ObservableProperty] private int targetWakeTimeHour = 7;
+        [ObservableProperty] private int targetWakeTimeMinute = 0;
+        [ObservableProperty] private bool sleepReminderEnabled;
+        [ObservableProperty] private bool isLoading;
 
-        [ObservableProperty]
-        private bool showCalculatedGoal;
+        // ── Computed: formatierte Anzeige ────────────────────────────────────
+        // Stunden/Minuten als 2-stelliger String für die Picker-Labels
+        public string TargetBedTimeHourDisplay => $"{TargetBedTimeHour % 24:D2}";
+        public string TargetBedTimeMinuteDisplay => $"{TargetBedTimeMinute:D2}";
+        public string TargetWakeTimeHourDisplay => $"{TargetWakeTimeHour:D2}";
+        public string TargetWakeTimeMinuteDisplay => $"{TargetWakeTimeMinute:D2}";
 
-        [ObservableProperty]
-        private string calculatedGoalText = string.Empty;
+        // Lesbarer Text unterhalb der Picker
+        public string TargetBedTimeDisplay =>
+            TargetBedTimeHour >= 24
+                ? $"{TargetBedTimeHour % 24:D2}:{TargetBedTimeMinute:D2} Uhr (+1 Tag)"
+                : $"{TargetBedTimeHour:D2}:{TargetBedTimeMinute:D2} Uhr";
 
-        [ObservableProperty]
-        private bool reminderEnabled;
+        public string TargetWakeTimeDisplay =>
+            $"{TargetWakeTimeHour:D2}:{TargetWakeTimeMinute:D2} Uhr";
 
-        [ObservableProperty]
-        private string reminderIntervalInput = string.Empty;
-
-        [ObservableProperty]
-        private int reminderStartHour = 8;
-
-        [ObservableProperty]
-        private int reminderEndHour = 22;
-
-        [ObservableProperty]
-        private string targetSleepHoursInput = "8";
-
-        [ObservableProperty]
-        private int targetBedTimeHour = 23;
-
-        [ObservableProperty]
-        private int targetBedTimeMinute = 0;
-
-        [ObservableProperty]
-        private int targetWakeTimeHour = 7;
-
-        [ObservableProperty]
-        private int targetWakeTimeMinute = 0;
-
-        [ObservableProperty]
-        private string weekendTargetHoursInput = string.Empty;
-
-        [ObservableProperty]
-        private bool sleepReminderEnabled;
-
-        [ObservableProperty]
-        private bool isLoading;
-
+        // ── Aktivitätslevel ──────────────────────────────────────────────────
         public List<ActivityLevelOption> ActivityLevels { get; } = new()
         {
-            new ActivityLevelOption { Value = "low", Display = "Niedrig (30ml/kg)" },
-            new ActivityLevelOption { Value = "medium", Display = "Mittel (35ml/kg)" },
-            new ActivityLevelOption { Value = "high", Display = "Hoch (40ml/kg)" }
+            new ActivityLevelOption { Value = "low",    Display = "Niedrig (30ml/kg)" },
+            new ActivityLevelOption { Value = "medium", Display = "Mittel (35ml/kg)"  },
+            new ActivityLevelOption { Value = "high",   Display = "Hoch (40ml/kg)"    }
         };
 
         public SettingsViewModel(ApiService apiService, SleepApiService sleepApiService, IReminderService reminderService)
@@ -76,42 +64,35 @@ namespace MauiAbschlussprojekt.ViewModels
             _reminderService = reminderService;
         }
 
-        public async Task InitializeAsync()
-        {
-            await LoadCurrentSettingsAsync();
-        }
+        public async Task InitializeAsync() => await LoadCurrentSettingsAsync();
 
+        // ── Daten laden ──────────────────────────────────────────────────────
         private async Task LoadCurrentSettingsAsync()
         {
             try
             {
                 var user = await _apiService.GetUserAsync();
+                if (user == null) return;
 
-                if (user != null)
-                {
-                    WeightInput = user.WeightKg?.ToString() ?? string.Empty;
-                    CustomGoalInput = user.DailyWaterGoalMl?.ToString() ?? string.Empty;
+                WeightInput = user.WeightKg?.ToString() ?? string.Empty;
+                CustomGoalInput = user.DailyWaterGoalMl?.ToString() ?? string.Empty;
 
-                    if (!string.IsNullOrEmpty(user.ActivityLevel))
-                    {
-                        SelectedActivityLevel = ActivityLevels.FirstOrDefault(a => a.Value == user.ActivityLevel);
-                    }
+                if (!string.IsNullOrEmpty(user.ActivityLevel))
+                    SelectedActivityLevel = ActivityLevels.FirstOrDefault(a => a.Value == user.ActivityLevel);
 
-                    ReminderEnabled = user.ReminderEnabled;
-                    ReminderIntervalInput = user.ReminderIntervalMinutes.ToString();
-                    ReminderStartHour = user.ReminderStartHour;
-                    ReminderEndHour = user.ReminderEndHour;
+                ReminderEnabled = user.ReminderEnabled;
+                ReminderIntervalInput = user.ReminderIntervalMinutes.ToString();
+                ReminderStartHour = user.ReminderStartHour;
+                ReminderEndHour = user.ReminderEndHour;
 
-                    TargetSleepHoursInput = user.TargetSleepHours.ToString("F1");
-                    TargetBedTimeHour = user.TargetBedTimeHour;
-                    TargetBedTimeMinute = user.TargetBedTimeMinute;
-                    TargetWakeTimeHour = user.TargetWakeTimeHour;
-                    TargetWakeTimeMinute = user.TargetWakeTimeMinute;
-                    WeekendTargetHoursInput = user.WeekendTargetSleepHours?.ToString("F1") ?? string.Empty;
-                    SleepReminderEnabled = user.SleepReminderEnabled;
+                TargetSleepHoursInput = user.TargetSleepHours.ToString("F1");
+                TargetBedTimeHour = user.TargetBedTimeHour;
+                TargetBedTimeMinute = user.TargetBedTimeMinute;
+                TargetWakeTimeHour = user.TargetWakeTimeHour;
+                TargetWakeTimeMinute = user.TargetWakeTimeMinute;
+                SleepReminderEnabled = user.SleepReminderEnabled;
 
-                    UpdateCalculatedGoal();
-                }
+                UpdateCalculatedGoal();
             }
             catch (Exception ex)
             {
@@ -119,16 +100,55 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
-        partial void OnWeightInputChanged(string value)
+        // ── Property-Changed Hooks ───────────────────────────────────────────
+        partial void OnTargetBedTimeHourChanged(int value)
         {
-            UpdateCalculatedGoal();
+            OnPropertyChanged(nameof(TargetBedTimeHourDisplay));
+            OnPropertyChanged(nameof(TargetBedTimeDisplay));
         }
-
-        partial void OnSelectedActivityLevelChanged(ActivityLevelOption? value)
+        partial void OnTargetBedTimeMinuteChanged(int value)
         {
-            UpdateCalculatedGoal();
+            OnPropertyChanged(nameof(TargetBedTimeMinuteDisplay));
+            OnPropertyChanged(nameof(TargetBedTimeDisplay));
         }
+        partial void OnTargetWakeTimeHourChanged(int value)
+        {
+            OnPropertyChanged(nameof(TargetWakeTimeHourDisplay));
+            OnPropertyChanged(nameof(TargetWakeTimeDisplay));
+        }
+        partial void OnTargetWakeTimeMinuteChanged(int value)
+        {
+            OnPropertyChanged(nameof(TargetWakeTimeMinuteDisplay));
+            OnPropertyChanged(nameof(TargetWakeTimeDisplay));
+        }
+        partial void OnWeightInputChanged(string value) => UpdateCalculatedGoal();
+        partial void OnSelectedActivityLevelChanged(ActivityLevelOption? value) => UpdateCalculatedGoal();
 
+        // ── Schlafenszeit-Picker Commands ─────────────────────────────────────
+        // Stunden: 0–27 (24=00:00 nächster Tag, bis 03:00)
+        [RelayCommand] private void IncrementBedHour() { if (TargetBedTimeHour < 27) TargetBedTimeHour++; }
+        [RelayCommand] private void DecrementBedHour() { if (TargetBedTimeHour > 0) TargetBedTimeHour--; }
+
+        // Minuten: 0 / 15 / 30 / 45
+        [RelayCommand]
+        private void IncrementBedMinute()
+            => TargetBedTimeMinute = TargetBedTimeMinute >= 45 ? 0 : TargetBedTimeMinute + 15;
+        [RelayCommand]
+        private void DecrementBedMinute()
+            => TargetBedTimeMinute = TargetBedTimeMinute <= 0 ? 45 : TargetBedTimeMinute - 15;
+
+        // ── Aufwachzeit-Picker Commands ───────────────────────────────────────
+        [RelayCommand] private void IncrementWakeHour() { if (TargetWakeTimeHour < 23) TargetWakeTimeHour++; }
+        [RelayCommand] private void DecrementWakeHour() { if (TargetWakeTimeHour > 0) TargetWakeTimeHour--; }
+
+        [RelayCommand]
+        private void IncrementWakeMinute()
+            => TargetWakeTimeMinute = TargetWakeTimeMinute >= 45 ? 0 : TargetWakeTimeMinute + 15;
+        [RelayCommand]
+        private void DecrementWakeMinute()
+            => TargetWakeTimeMinute = TargetWakeTimeMinute <= 0 ? 45 : TargetWakeTimeMinute - 15;
+
+        // ── Wasserziel berechnen ─────────────────────────────────────────────
         private void UpdateCalculatedGoal()
         {
             if (double.TryParse(WeightInput, out double weight) && SelectedActivityLevel != null)
@@ -140,9 +160,7 @@ namespace MauiAbschlussprojekt.ViewModels
                     "high" => 40,
                     _ => 33
                 };
-
-                int calculatedGoal = (int)(weight * multiplier);
-                CalculatedGoalText = $"Empfohlenes Tagesziel: {calculatedGoal} ml";
+                CalculatedGoalText = $"Empfohlenes Tagesziel: {(int)(weight * multiplier)} ml";
                 ShowCalculatedGoal = true;
             }
             else
@@ -151,62 +169,41 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
+        // ── Commands: Speichern ──────────────────────────────────────────────
         [RelayCommand]
         private async Task SaveUserSettingsAsync()
         {
             IsLoading = true;
-
             try
             {
                 var request = new UpdateUserRequest();
+                if (double.TryParse(WeightInput, out double weight)) request.WeightKg = weight;
+                if (SelectedActivityLevel != null) request.ActivityLevel = SelectedActivityLevel.Value;
+                if (int.TryParse(CustomGoalInput, out int goal) && goal > 0) request.DailyWaterGoalMl = goal;
 
-                if (double.TryParse(WeightInput, out double weight))
-                    request.WeightKg = weight;
-
-                if (SelectedActivityLevel != null)
-                    request.ActivityLevel = SelectedActivityLevel.Value;
-
-                if (int.TryParse(CustomGoalInput, out int customGoal) && customGoal > 0)
-                    request.DailyWaterGoalMl = customGoal;
-
-                var result = await _apiService.UpdateUserAsync(request);
-
-                if (result != null)
-                {
+                if (await _apiService.UpdateUserAsync(request) != null)
                     await Shell.Current.DisplayAlert("Erfolg", "Einstellungen gespeichert", "OK");
-                }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Speichern: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            catch (Exception ex) { await Shell.Current.DisplayAlert("Fehler", ex.Message, "OK"); }
+            finally { IsLoading = false; }
         }
 
         [RelayCommand]
         private async Task SaveReminderSettingsAsync()
         {
             IsLoading = true;
-
             try
             {
+                int interval = int.TryParse(ReminderIntervalInput, out int iv) ? iv : 60;
                 var request = new UpdateReminderRequest
                 {
-                    ReminderEnabled = ReminderEnabled
+                    ReminderEnabled = ReminderEnabled,
+                    ReminderIntervalMinutes = interval,
+                    ReminderStartHour = ReminderStartHour,
+                    ReminderEndHour = ReminderEndHour
                 };
 
-                if (int.TryParse(ReminderIntervalInput, out int interval))
-                    request.ReminderIntervalMinutes = interval;
-
-                request.ReminderStartHour = ReminderStartHour;
-                request.ReminderEndHour = ReminderEndHour;
-
-                var result = await _apiService.UpdateReminderSettingsAsync(request);
-
-                if (result != null)
+                if (await _apiService.UpdateReminderSettingsAsync(request) != null)
                 {
                     if (ReminderEnabled)
                     {
@@ -217,25 +214,17 @@ namespace MauiAbschlussprojekt.ViewModels
                     {
                         _reminderService.StopPeriodicNotifications();
                     }
-
                     await Shell.Current.DisplayAlert("Erfolg", "Erinnerungen gespeichert", "OK");
                 }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Speichern: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            catch (Exception ex) { await Shell.Current.DisplayAlert("Fehler", ex.Message, "OK"); }
+            finally { IsLoading = false; }
         }
 
         [RelayCommand]
         private async Task SaveSleepSettingsAsync()
         {
             IsLoading = true;
-
             try
             {
                 var request = new UpdateSleepSettingsRequest
@@ -246,45 +235,43 @@ namespace MauiAbschlussprojekt.ViewModels
                     TargetWakeTimeMinute = TargetWakeTimeMinute,
                     SleepReminderEnabled = SleepReminderEnabled
                 };
-
-                if (double.TryParse(TargetSleepHoursInput, out double targetHours))
-                    request.TargetSleepHours = targetHours;
-
-                if (!string.IsNullOrEmpty(WeekendTargetHoursInput) && double.TryParse(WeekendTargetHoursInput, out double weekendHours))
-                    request.WeekendTargetSleepHours = weekendHours;
+                if (double.TryParse(TargetSleepHoursInput, out double h)) request.TargetSleepHours = h;
 
                 var result = await _sleepApiService.UpdateSleepSettingsAsync(request);
-
                 if (result != null)
                 {
+                    if (SleepReminderEnabled)
+                    {
+                        await _reminderService.RequestPermissionAsync();
+                        ScheduleSleepReminder();
+                    }
+                    else
+                    {
+                        _reminderService.CancelSleepReminder();
+                    }
+
                     await Shell.Current.DisplayAlert("Erfolg", "Schlaf-Einstellungen gespeichert", "OK");
                 }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Speichern: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            catch (Exception ex) { await Shell.Current.DisplayAlert("Fehler", ex.Message, "OK"); }
+            finally { IsLoading = false; }
+        }
+
+        private void ScheduleSleepReminder()
+        {
+            // Delegiert an den ReminderService – dieser berechnet intern
+            // die Erinnerungszeit als 1 Stunde vor der Schlafenszeit und
+            // prüft minütlich ob die Zeit erreicht ist (nur 1x pro Tag).
+            _reminderService.ScheduleDailySleepReminder(TargetBedTimeHour, TargetBedTimeMinute);
         }
 
         [RelayCommand]
         private async Task LogoutAsync()
         {
-            bool confirm = await Shell.Current.DisplayAlert(
-                "Abmelden",
-                "Möchtest du dich wirklich abmelden?",
-                "Ja",
-                "Nein");
-
-            if (!confirm)
+            if (!await Shell.Current.DisplayAlert("Abmelden", "Möchtest du dich wirklich abmelden?", "Ja", "Nein"))
                 return;
 
             _apiService.Logout();
-
-            // Navigate to Login - muss absolute Route sein
             Application.Current!.MainPage = new AppShell();
             await Shell.Current.GoToAsync("//LoginPage");
         }

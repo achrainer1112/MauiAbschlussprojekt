@@ -61,7 +61,6 @@ namespace Models
         public int TargetBedTimeMinute { get; set; }
         public int TargetWakeTimeHour { get; set; }
         public int TargetWakeTimeMinute { get; set; }
-        public double? WeekendTargetSleepHours { get; set; }
         public bool SleepReminderEnabled { get; set; }
     }
 
@@ -109,6 +108,7 @@ namespace Models
         public int GoalMl { get; set; }
         public double Percentage { get; set; }
         public bool GoalReached { get; set; }
+        public double ProgressValue => GoalMl > 0 ? Math.Min(TotalMl / (double)GoalMl, 1.0) : 0.0;
     }
 
     public class WeekStatsDto

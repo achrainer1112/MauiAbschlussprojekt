@@ -7,23 +7,26 @@ namespace MauiAbschlussprojekt.Services
         Task<bool> RequestPermissionAsync();
         void StartPeriodicNotifications(int intervalMinutes, int startHour, int endHour);
         void StopPeriodicNotifications();
+        void ScheduleDailySleepReminder(int bedTimeHour, int bedTimeMinute);
+        void CancelSleepReminder();
     }
 
     public class ReminderService : IReminderService
     {
-        private Timer? _notificationTimer;
+        private Timer? _waterNotificationTimer;
+        private Timer? _sleepReminderTimer;
 
+        // ── Berechtigungen ────────────────────────────────────────────────────
         public async Task<bool> RequestPermissionAsync()
         {
 #if ANDROID || IOS
             try
             {
-                if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+                if (!await LocalNotificationCenter.Current.AreNotificationsEnabled())
                 {
                     var result = await LocalNotificationCenter.Current.RequestNotificationPermission();
                     return result != null;
                 }
-
                 return true;
             }
             catch (Exception ex)
@@ -36,69 +39,128 @@ namespace MauiAbschlussprojekt.Services
 #endif
         }
 
+        // ── Wasser-Erinnerungen (periodisch) ─────────────────────────────────
         public void StartPeriodicNotifications(int intervalMinutes, int startHour, int endHour)
         {
 #if ANDROID || IOS
-            StopPeriodicNotifications();
+            _waterNotificationTimer?.Dispose();
 
-            _notificationTimer = new Timer(_ =>
+            _waterNotificationTimer = new Timer(_ =>
             {
                 var now = DateTime.Now;
-                bool isInTimeWindow;
+                bool inWindow;
 
-                // Sonderfall: 0-0 bedeutet ganztägig (24 Stunden)
                 if (startHour == 0 && endHour == 0)
-                {
-                    isInTimeWindow = true;
-                }
-                // Normalfall: Zeitfenster innerhalb eines Tages (z.B. 8-22)
+                    inWindow = true;
                 else if (startHour <= endHour)
-                {
-                    isInTimeWindow = now.Hour >= startHour && now.Hour <= endHour;
-                }
-                // Über Mitternacht: Zeitfenster geht über Mitternacht (z.B. 22-8)
+                    inWindow = now.Hour >= startHour && now.Hour <= endHour;
                 else
-                {
-                    isInTimeWindow = now.Hour >= startHour || now.Hour <= endHour;
-                }
+                    inWindow = now.Hour >= startHour || now.Hour <= endHour;
 
-                if (isInTimeWindow)
-                {
-                    ShowNotification();
-                }
+                if (inWindow)
+                    ShowWaterNotification();
+
             }, null, TimeSpan.Zero, TimeSpan.FromMinutes(intervalMinutes));
 #endif
         }
 
         public void StopPeriodicNotifications()
         {
-            _notificationTimer?.Dispose();
-            _notificationTimer = null;
+            _waterNotificationTimer?.Dispose();
+            _waterNotificationTimer = null;
 
 #if ANDROID || IOS
-            LocalNotificationCenter.Current.CancelAll();
+            LocalNotificationCenter.Current.Cancel(1000);
 #endif
         }
 
+        // ── Schlaf-Erinnerung (täglich 1h vor Schlafenszeit) ─────────────────
+        /// <summary>
+        /// Plant eine tägliche Schlaf-Erinnerung 1 Stunde vor der Ziel-Schlafenszeit.
+        /// Der Timer prüft jede Minute ob die Erinnerungszeit erreicht ist und
+        /// sendet dann genau einmal pro Tag eine Benachrichtigung.
+        /// Beispiel: bedTimeHour=23, bedTimeMinute=30 → Erinnerung täglich um 22:30.
+        /// </summary>
+        public void ScheduleDailySleepReminder(int bedTimeHour, int bedTimeMinute)
+        {
 #if ANDROID || IOS
-        private async void ShowNotification()
+            CancelSleepReminder();
+
+            // Erinnerungszeit = 1 Stunde vor Schlafenszeit
+            // bedTimeHour kann 0–27 sein (Werte >23 = nach Mitternacht)
+            int realBedHour = bedTimeHour % 24;
+            int reminderHour = realBedHour == 0 ? 23 : realBedHour - 1;
+            int reminderMinute = bedTimeMinute;
+
+            // Merken wann zuletzt gefeuert, damit pro Tag nur 1x
+            DateTime lastFired = DateTime.MinValue;
+
+            _sleepReminderTimer = new Timer(_ =>
+            {
+                var now = DateTime.Now;
+
+                // Feuere wenn Stunde+Minute übereinstimmt und heute noch nicht gefeuert
+                if (now.Hour == reminderHour &&
+                    now.Minute == reminderMinute &&
+                    now.Date != lastFired.Date)
+                {
+                    lastFired = now;
+                    ShowSleepReminderNotification(realBedHour, bedTimeMinute);
+                }
+
+            }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+#endif
+        }
+
+        public void CancelSleepReminder()
+        {
+            _sleepReminderTimer?.Dispose();
+            _sleepReminderTimer = null;
+
+#if ANDROID || IOS
+            LocalNotificationCenter.Current.Cancel(2000);
+#endif
+        }
+
+        // ── Private: Notifications anzeigen ──────────────────────────────────
+#if ANDROID || IOS
+        private async void ShowWaterNotification()
         {
             try
             {
-                var notification = new NotificationRequest
+                await LocalNotificationCenter.Current.Show(new NotificationRequest
                 {
                     NotificationId = 1000,
-                    Title = "Trink-Erinnerung",
+                    Title = "💧 Trink-Erinnerung",
                     Description = "Zeit, etwas Wasser zu trinken!",
                     BadgeNumber = 1,
                     CategoryType = NotificationCategoryType.Status
-                };
-
-                await LocalNotificationCenter.Current.Show(notification);
+                });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Fehler beim Anzeigen der Benachrichtigung: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Wasser-Notification Fehler: {ex.Message}");
+            }
+        }
+
+        private async void ShowSleepReminderNotification(int bedHour, int bedMinute)
+        {
+            try
+            {
+                string bedTimeStr = $"{bedHour:D2}:{bedMinute:D2} Uhr";
+
+                await LocalNotificationCenter.Current.Show(new NotificationRequest
+                {
+                    NotificationId = 2000,
+                    Title = "😴 Zeit zum Schlafen!",
+                    Description = $"In 1 Stunde ist deine Schlafenszeit ({bedTimeStr}). Bereite dich auf den Schlaf vor.",
+                    BadgeNumber = 1,
+                    CategoryType = NotificationCategoryType.Status
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Schlaf-Notification Fehler: {ex.Message}");
             }
         }
 #endif

@@ -16,148 +16,140 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Sleep Duration Summary -->
+            <!-- Schlafdauer-Zusammenfassung -->
             <Border StrokeThickness="2"
                     Stroke="#3498DB"
                     BackgroundColor="#E8F4F8"
                     Padding="15">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="10"/>
                 </Border.StrokeShape>
-
-                <VerticalStackLayout Spacing="5">
+                <VerticalStackLayout Spacing="4">
                     <Label Text="Geschätzte Schlafdauer"
-                           FontSize="14"
-                           TextColor="Gray"/>
+                           FontSize="13" TextColor="Gray" HorizontalOptions="Center"/>
                     <Label Text="{Binding CalculatedSleepHours, StringFormat='{0:F1} Stunden'}"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           TextColor="#3498DB"/>
+                           FontSize="28" FontAttributes="Bold" TextColor="#3498DB"
+                           HorizontalOptions="Center"/>
+                    <Label Text="{Binding SleepDurationWarning}"
+                           FontSize="12" TextColor="#E74C3C"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding HasWarning}"/>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Times Section -->
+            <!-- Zeiten -->
             <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="⏰ Zeiten"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
+                    <Label Text="⏰ Zeiten" FontSize="18" FontAttributes="Bold"/>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Ins Bett gegangen"/>
-                        <DatePicker Date="{Binding BedTime, Mode=TwoWay}"
-                                  Format="dd.MM.yyyy"/>
-                        <TimePicker Time="{Binding BedTime, Mode=TwoWay}"/>
+                    <!-- Ins Bett -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="🛏️ Ins Bett gegangen" FontAttributes="Bold"/>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Datum" FontSize="11" TextColor="Gray"/>
+                                <DatePicker Date="{Binding BedDate, Mode=TwoWay}"
+                                            Format="dd.MM.yyyy"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="Uhrzeit" FontSize="11" TextColor="Gray"/>
+                                <TimePicker Time="{Binding BedTimeSpan, Mode=TwoWay}"
+                                            Format="HH:mm"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Label Text="{Binding BedTime, StringFormat='🛏️ {0:ddd, dd.MM. – HH:mm} Uhr'}"
+                               FontSize="12" TextColor="Gray"/>
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Aufgewacht"/>
-                        <DatePicker Date="{Binding WakeTime, Mode=TwoWay}"
-                                  Format="dd.MM.yyyy"/>
-                        <TimePicker Time="{Binding WakeTime, Mode=TwoWay}"/>
+                    <!-- Aufgewacht -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="☀️ Aufgewacht" FontAttributes="Bold"/>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Datum" FontSize="11" TextColor="Gray"/>
+                                <DatePicker Date="{Binding WakeDate, Mode=TwoWay}"
+                                            Format="dd.MM.yyyy"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="Uhrzeit" FontSize="11" TextColor="Gray"/>
+                                <TimePicker Time="{Binding WakeTimeSpan, Mode=TwoWay}"
+                                            Format="HH:mm"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Label Text="{Binding WakeTime, StringFormat='☀️ {0:ddd, dd.MM. – HH:mm} Uhr'}"
+                               FontSize="12" TextColor="Gray"/>
                     </VerticalStackLayout>
+
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Fall Asleep Duration -->
+            <!-- Einschlafdauer -->
             <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="⏱️ Einschlafdauer"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
-
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="⏱️ Einschlafdauer" FontSize="18" FontAttributes="Bold"/>
                     <Picker ItemsSource="{Binding FallAsleepCategories}"
                             SelectedItem="{Binding SelectedFallAsleepCategory}"/>
-
-                    <Label Text="Schnell: unter 15 Min • Normal: 15-30 Min • Mittel: 30-60 Min • Lang: über 60 Min"
-                           FontSize="11"
-                           TextColor="Gray"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Sleep Quality -->
+            <!-- Schlafqualität -->
             <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="⭐ Schlafqualität"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
-
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="⭐ Schlafqualität" FontSize="18" FontAttributes="Bold"/>
                     <Label Text="{Binding SleepQuality, StringFormat='Bewertung: {0}/5'}"
-                           FontSize="16"
-                           HorizontalOptions="Center"/>
-
-                    <Slider Minimum="1"
-                            Maximum="5"
-                            Value="{Binding SleepQuality}"
-                            MinimumTrackColor="#3498DB"
-                            MaximumTrackColor="LightGray"/>
-
-                    <HorizontalStackLayout Spacing="5" HorizontalOptions="Center">
-                        <Label Text="1 = Sehr schlecht" FontSize="12" TextColor="Gray"/>
-                        <Label Text="•" TextColor="Gray"/>
-                        <Label Text="5 = Ausgezeichnet" FontSize="12" TextColor="Gray"/>
-                    </HorizontalStackLayout>
+                           FontSize="16" HorizontalOptions="Center"/>
+                    <Slider Value="{Binding SleepQuality, Mode=TwoWay}"
+                            Minimum="1" Maximum="5"/>
+                    <Grid ColumnDefinitions="*,*,*,*,*">
+                        <Label Grid.Column="0" Text="😴 Schlecht"  FontSize="10" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Text="😕"           FontSize="18" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Text="😐 Okay"      FontSize="10" HorizontalOptions="Center"/>
+                        <Label Grid.Column="3" Text="🙂"           FontSize="18" HorizontalOptions="Center"/>
+                        <Label Grid.Column="4" Text="😄 Super"     FontSize="10" HorizontalOptions="Center"/>
+                    </Grid>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Dream Journal -->
+            <!-- Traumtagebuch -->
             <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="💭 Traumtagebuch (optional)"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
-
-                    <Editor Placeholder="Beschreibe deinen Traum..."
-                            Text="{Binding DreamText}"
-                            HeightRequest="100"
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="💭 Traumtagebuch (optional)" FontSize="18" FontAttributes="Bold"/>
+                    <Editor Text="{Binding DreamText}"
+                            Placeholder="Was hast du geträumt?"
+                            HeightRequest="80"
                             AutoSize="TextChanges"/>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Traum-Stimmung"/>
+                    <VerticalStackLayout Spacing="5" IsVisible="{Binding HasDreamText}">
+                        <Label Text="Traumstimmung" FontSize="13"/>
                         <Picker ItemsSource="{Binding DreamMoods}"
                                 SelectedItem="{Binding SelectedDreamMood}"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Notes -->
+            <!-- Notizen -->
             <Frame BorderColor="LightGray" CornerRadius="10" Padding="15" HasShadow="False">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="📝 Notizen (optional)"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
-
-                    <Editor Placeholder="z.B. 'Unruhig', 'Oft aufgewacht', 'Gut durchgeschlafen'..."
-                            Text="{Binding Notes}"
-                            HeightRequest="80"
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📝 Notizen (optional)" FontSize="18" FontAttributes="Bold"/>
+                    <Editor Text="{Binding Notes}"
+                            Placeholder="Besonderheiten, Gefühle, ..."
+                            HeightRequest="70"
                             AutoSize="TextChanges"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
-                <Button Grid.Column="0"
-                        Text="Abbrechen"
-                        Command="{Binding CancelCommand}"
-                        BackgroundColor="#95A5A6"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
-
-                <Button Grid.Column="1"
-                        Text="Speichern"
-                        Command="{Binding SaveCommand}"
-                        BackgroundColor="#27AE60"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
-            </Grid>
+            <!-- Speichern -->
+            <Button Text="💾 Speichern"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#9B59B6"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    FontAttributes="Bold"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
 
             <ActivityIndicator IsRunning="{Binding IsLoading}"
-                             IsVisible="{Binding IsLoading}"
-                             Color="#3498DB"/>
+                               IsVisible="{Binding IsLoading}"
+                               Color="#9B59B6"/>
 
         </VerticalStackLayout>
     </ScrollView>

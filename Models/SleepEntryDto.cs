@@ -53,7 +53,7 @@ namespace Models
         public double AverageSleepQuality { get; set; }
         public TimeSpan AverageBedTime { get; set; }
         public TimeSpan AverageWakeTime { get; set; }
-        public int ConsistencyScore { get; set; } // 0-100
+        public int ConsistencyScore { get; set; }
         public SleepEntryDto? BestNight { get; set; }
         public SleepEntryDto? WorstNight { get; set; }
         public int TotalDreams { get; set; }
@@ -81,6 +81,12 @@ namespace Models
         public string? Notes { get; set; }
     }
 
+    public class DreamMoodCount
+    {
+        public string Mood { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+
     // Update User DTO with sleep settings
     public class UpdateSleepSettingsRequest
     {
@@ -89,7 +95,6 @@ namespace Models
         public int? TargetBedTimeMinute { get; set; }
         public int? TargetWakeTimeHour { get; set; }
         public int? TargetWakeTimeMinute { get; set; }
-        public double? WeekendTargetSleepHours { get; set; }
         public bool? SleepReminderEnabled { get; set; }
     }
 }

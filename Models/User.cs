@@ -70,9 +70,6 @@ namespace Models
         [Column("target_wake_time_minute")]
         public int TargetWakeTimeMinute { get; set; } = 0;
 
-        [Column("weekend_target_sleep_hours")]
-        public double? WeekendTargetSleepHours { get; set; }
-
         [Column("sleep_reminder_enabled")]
         public bool SleepReminderEnabled { get; set; } = false;
 
