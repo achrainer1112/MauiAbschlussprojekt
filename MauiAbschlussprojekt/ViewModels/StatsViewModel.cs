@@ -47,7 +47,6 @@ namespace MauiAbschlussprojekt.ViewModels
                 {
                     WeekStats.Clear();
 
-                    // Umgekehrte Reihenfolge: neuester Tag zuerst
                     foreach (var day in stats.Days.OrderByDescending(d => d.Date))
                     {
                         WeekStats.Add(day);
@@ -71,7 +70,7 @@ namespace MauiAbschlussprojekt.ViewModels
         [RelayCommand]
         private async Task BackAsync()
         {
-            await Shell.Current.GoToAsync("//MainPage");
+            await Shell.Current.GoToAsync("//WaterTracker");
         }
     }
 }

@@ -7,9 +7,18 @@
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="#2C3E50">
 
+    <!-- Login / Register - im Flyout versteckt, aber als absolute Route erreichbar -->
+    <ShellContent Route="LoginPage"
+                  ContentTemplate="{DataTemplate views:LoginPage}"
+                  Shell.FlyoutItemIsVisible="False"/>
+
+    <ShellContent Route="RegisterPage"
+                  ContentTemplate="{DataTemplate views:RegisterPage}"
+                  Shell.FlyoutItemIsVisible="False"/>
+
     <!-- Flyout Header -->
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="#34495E" 
+        <Grid BackgroundColor="#34495E"
               Padding="20"
               HeightRequest="150">
             <VerticalStackLayout VerticalOptions="Center" Spacing="10">
@@ -28,19 +37,19 @@
     </Shell.FlyoutHeader>
 
     <!-- Flyout Items (Hauptmenü) -->
-    <FlyoutItem Title="Wasser-Tracker" 
+    <FlyoutItem Title="Wasser-Tracker"
                 Icon="drop.png"
                 Route="WaterTracker">
         <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Schlaf-Tracker" 
+    <FlyoutItem Title="Schlaf-Tracker"
                 Icon="moon.png"
                 Route="SleepTracker">
         <ShellContent ContentTemplate="{DataTemplate views:SleepTrackerPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Einstellungen" 
+    <FlyoutItem Title="Einstellungen"
                 Icon="settings.png"
                 Route="Settings">
         <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
@@ -48,7 +57,7 @@
 
     <!-- Flyout Footer -->
     <Shell.FlyoutFooter>
-        <Grid BackgroundColor="#1A252F" 
+        <Grid BackgroundColor="#1A252F"
               Padding="20,10"
               HeightRequest="60">
             <Label Text="Version 1.0"
@@ -58,27 +67,5 @@
                    VerticalOptions="Center"/>
         </Grid>
     </Shell.FlyoutFooter>
-
-    <!-- Flyout Styling -->
-    <Shell.FlyoutHeaderTemplate>
-        <DataTemplate>
-            <Grid BackgroundColor="#34495E" 
-                  Padding="20"
-                  HeightRequest="150">
-                <VerticalStackLayout VerticalOptions="Center" Spacing="10">
-                    <Label Text="💧😴 HealthTracker"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           TextColor="White"
-                           HorizontalOptions="Center"/>
-                    <Label Text="Dein Gesundheits-Assistent"
-                           FontSize="14"
-                           TextColor="White"
-                           Opacity="0.8"
-                           HorizontalOptions="Center"/>
-                </VerticalStackLayout>
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
 
 </Shell>

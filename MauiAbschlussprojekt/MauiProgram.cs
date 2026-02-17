@@ -27,6 +27,7 @@ namespace MauiAbschlussprojekt
 
             // Services
             builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<SleepApiService>();
             builder.Services.AddSingleton<IReminderService, ReminderService>();
 
             // Views
@@ -35,6 +36,9 @@ namespace MauiAbschlussprojekt
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<StatsPage>();
             builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<SleepTrackerPage>();
+            builder.Services.AddTransient<SleepStatsPage>();
+            builder.Services.AddTransient<AddSleepEntryPage>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
@@ -42,6 +46,9 @@ namespace MauiAbschlussprojekt
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<StatsViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<SleepTrackerViewModel>();
+            builder.Services.AddTransient<SleepStatsViewModel>();
+            builder.Services.AddTransient<AddSleepEntryViewModel>();
 
 #if DEBUG
             builder.Logging.AddDebug();

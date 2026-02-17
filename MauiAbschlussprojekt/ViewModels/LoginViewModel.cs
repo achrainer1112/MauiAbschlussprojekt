@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MauiAbschlussprojekt.Services;
 using Models;
+using MauiAbschlussprojekt.Services;
 
 namespace MauiAbschlussprojekt.ViewModels
 {
@@ -29,15 +29,14 @@ namespace MauiAbschlussprojekt.ViewModels
         [RelayCommand]
         private async Task LoginAsync()
         {
-            ErrorMessage = string.Empty;
-
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
-                ErrorMessage = "Bitte Email und Passwort eingeben";
+                ErrorMessage = "Bitte E-Mail und Passwort eingeben.";
                 return;
             }
 
             IsLoading = true;
+            ErrorMessage = string.Empty;
 
             try
             {
@@ -51,13 +50,11 @@ namespace MauiAbschlussprojekt.ViewModels
 
                 if (response.Success)
                 {
-                    await Shell.Current.DisplayAlertAsync("Erfolg",
-                        $"Willkommen zurück, {response.User?.Username}!", "OK");
-                    await Shell.Current.GoToAsync("//MainPage");
+                    await Shell.Current.GoToAsync("//WaterTracker");
                 }
                 else
                 {
-                    ErrorMessage = response.Message;
+                    ErrorMessage = $"Fehler: {response.Message}";
                 }
             }
             catch (Exception ex)
@@ -73,7 +70,7 @@ namespace MauiAbschlussprojekt.ViewModels
         [RelayCommand]
         private async Task NavigateToRegisterAsync()
         {
-            await Shell.Current.GoToAsync("///RegisterPage");
+            await Shell.Current.GoToAsync("//RegisterPage");
         }
     }
 }
