@@ -72,7 +72,8 @@ namespace MauiAbschlussprojekt.ViewModels
                 if (weekStats != null)
                 {
                     WeekStats.Clear();
-                    foreach (var day in weekStats.Days)
+                    // weekStats.Days comes from server ordered oldest->newest; show newest first (yesterday on top)
+                    foreach (var day in weekStats.Days.OrderByDescending(d => d.Date))
                     {
                         WeekStats.Add(day);
                     }

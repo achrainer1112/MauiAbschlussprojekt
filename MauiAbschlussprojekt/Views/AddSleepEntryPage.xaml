@@ -39,11 +39,11 @@
             <!-- Zeiten -->
             <Frame>
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="⏰ Zeiten" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Zeiten" FontSize="18" FontAttributes="Bold"/>
 
                     <!-- Ins Bett -->
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="🛏️ Ins Bett gegangen" FontAttributes="Bold"/>
+                        <Label Text="Ins Bett gegangen" FontAttributes="Bold"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <VerticalStackLayout Grid.Column="0" Spacing="2">
                                 <Label Text="Datum" FontSize="11" TextColor="Gray"/>
@@ -59,7 +59,7 @@
 
                     <!-- Aufgewacht -->
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="☀️ Aufgewacht" FontAttributes="Bold"/>
+                        <Label Text="Aufgewacht" FontAttributes="Bold"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <VerticalStackLayout Grid.Column="0" Spacing="2">
                                 <Label Text="Datum" FontSize="11" TextColor="Gray"/>
@@ -78,7 +78,7 @@
             <!-- Einschlafdauer -->
             <Frame>
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="⏱️ Einschlafdauer" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Einschlafdauer" FontSize="18" FontAttributes="Bold"/>
                     <Picker x:Name="FallAsleepPicker" Title="Bitte wählen..."/>
                 </VerticalStackLayout>
             </Frame>
@@ -86,16 +86,16 @@
             <!-- Schlafqualität -->
             <Frame>
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="⭐ Schlafqualität" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Schlafqualität" FontSize="18" FontAttributes="Bold"/>
                     <Label x:Name="QualityLabel" FontSize="16" HorizontalOptions="Center"/>
                     <Slider x:Name="QualitySlider" Minimum="1" Maximum="5"
                             MinimumTrackColor="#9B59B6" MaximumTrackColor="LightGray"/>
                     <Grid ColumnDefinitions="*,*,*,*,*">
-                        <Label Grid.Column="0" Text="😴" FontSize="18" HorizontalOptions="Center"/>
-                        <Label Grid.Column="1" Text="😕" FontSize="18" HorizontalOptions="Center"/>
-                        <Label Grid.Column="2" Text="😐" FontSize="18" HorizontalOptions="Center"/>
-                        <Label Grid.Column="3" Text="🙂" FontSize="18" HorizontalOptions="Center"/>
-                        <Label Grid.Column="4" Text="😄" FontSize="18" HorizontalOptions="Center"/>
+                        <Label Grid.Column="0" Text="1" FontSize="14" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Text="2" FontSize="14" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Text="3" FontSize="14" HorizontalOptions="Center"/>
+                        <Label Grid.Column="3" Text="4" FontSize="14" HorizontalOptions="Center"/>
+                        <Label Grid.Column="4" Text="5" FontSize="14" HorizontalOptions="Center"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
@@ -103,7 +103,7 @@
             <!-- Traumtagebuch -->
             <Frame>
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="💭 Traumtagebuch (optional)" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Traumtagebuch (optional)" FontSize="18" FontAttributes="Bold"/>
                     <Editor x:Name="DreamTextEditor"
                             Placeholder="Was hast du geträumt?"
                             HeightRequest="80" AutoSize="TextChanges"/>
@@ -117,7 +117,7 @@
             <!-- Notizen -->
             <Frame>
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="📝 Notizen (optional)" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Notizen (optional)" FontSize="18" FontAttributes="Bold"/>
                     <Editor x:Name="NotesEditor"
                             Placeholder="Besonderheiten, Gefühle, ..."
                             HeightRequest="70" AutoSize="TextChanges"/>
@@ -129,7 +129,7 @@
                 <Button Grid.Column="0" Text="Abbrechen" x:Name="CancelButton"
                         BackgroundColor="#95A5A6" TextColor="White"
                         CornerRadius="10" HeightRequest="50"/>
-                <Button Grid.Column="1" Text="💾 Speichern" x:Name="SaveButton"
+                <Button Grid.Column="1" Text="Speichern" x:Name="SaveButton"
                         BackgroundColor="#27AE60" TextColor="White"
                         CornerRadius="10" HeightRequest="50" FontAttributes="Bold"/>
             </Grid>

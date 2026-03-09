@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
             var startDate = DateTime.UtcNow.Date.AddDays(-days);
 
             var entries = await _context.SleepEntries
-                .Where(s => s.UserId == userId && s.BedTime >= startDate)
+                .Where(s => s.UserId == userId && s.BedTime.Date >= startDate)
                 .OrderByDescending(s => s.BedTime)
                 .Select(s => new SleepEntryDto
                 {
@@ -241,7 +241,7 @@ namespace WebAPI.Controllers
             var startDate = DateTime.UtcNow.Date.AddDays(-days);
 
             var entries = await _context.SleepEntries
-                .Where(s => s.UserId == userId && s.BedTime >= startDate)
+                .Where(s => s.UserId == userId && s.BedTime.Date >= startDate)
                 .OrderByDescending(s => s.BedTime)
                 .ToListAsync();
 

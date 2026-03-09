@@ -79,15 +79,27 @@ namespace Models
         public int SleepQuality { get; set; }
         public bool GoalMet { get; set; }
         public string? Notes { get; set; }
+
+        // Berechneter Fortschrittswert für ProgressBar (0.0 – 1.0)
+        public double ProgressValue => TargetSleepHours > 0
+            ? Math.Min(TotalSleepHours / TargetSleepHours, 1.0)
+            : 0.0;
+
+        // Anzeigetext für Ziel-Status
+        public string GoalStatusText => GoalMet ? "✅ Ziel erreicht" : (TotalSleepHours > 0 ? "❌ Ziel nicht erreicht" : "– Kein Eintrag");
+
+        // Farbe für ProgressBar
+        public string ProgressColor => GoalMet ? "#27AE60" : (TotalSleepHours > 0 ? "#E67E22" : "#BDC3C7");
     }
 
     public class DreamMoodCount
     {
         public string Mood { get; set; } = string.Empty;
         public int Count { get; set; }
+        public string DisplayText => $"{Mood}: {Count}x";
     }
 
-    // Update User DTO with sleep settings
+
     public class UpdateSleepSettingsRequest
     {
         public double? TargetSleepHours { get; set; }

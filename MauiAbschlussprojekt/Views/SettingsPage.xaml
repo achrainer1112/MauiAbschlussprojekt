@@ -19,7 +19,7 @@
             <!-- Water Tracker Settings -->
             <Frame BorderColor="#3498DB" CornerRadius="12" Padding="15" HasShadow="True">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="💧 Wasser-Tracker"
+                    <Label Text="Wasser-Tracker"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="#3498DB"/>
@@ -51,7 +51,7 @@
                                Keyboard="Numeric"/>
                     </VerticalStackLayout>
 
-                    <Button Text="💧 Wasser-Einstellungen speichern"
+                    <Button Text="Wasser-Einstellungen speichern"
                             Command="{Binding SaveUserSettingsCommand}"
                             BackgroundColor="#3498DB"
                             TextColor="White"
@@ -63,7 +63,7 @@
             <!-- Water Reminders -->
             <Frame BorderColor="#2ECC71" CornerRadius="12" Padding="15" HasShadow="True">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="🔔 Wasser-Erinnerungen"
+                    <Label Text="Wasser-Erinnerungen"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="#27AE60"/>
@@ -105,7 +105,7 @@
                                    TextColor="Gray"/>
                         </VerticalStackLayout>
 
-                        <Button Text="🔔 Erinnerungen speichern"
+                        <Button Text="Erinnerungen speichern"
                                 Command="{Binding SaveReminderSettingsCommand}"
                                 BackgroundColor="#27AE60"
                                 TextColor="White"
@@ -118,7 +118,7 @@
             <!-- Sleep Tracker Settings -->
             <Frame BorderColor="#9B59B6" CornerRadius="12" Padding="15" HasShadow="True">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="😴 Schlaf-Tracker"
+                    <Label Text="Schlaf-Tracker"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="#9B59B6"/>
@@ -131,127 +131,17 @@
                     </VerticalStackLayout>
 
                     <!-- Ziel-Schlafenszeit -->
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Ziel-Schlafenszeit" FontAttributes="Bold"/>
-                        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10" HorizontalOptions="Center" WidthRequest="270">
-
-                            <!-- Stunden-Picker -->
-                            <VerticalStackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
-                                <Label Text="Stunden" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
-                                <Border Stroke="#9B59B6" StrokeThickness="1.5" HorizontalOptions="Center">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="10"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="38,46,38" HeightRequest="46">
-                                        <Button Grid.Column="0" Text="−"
-                                                Command="{Binding DecrementBedHourCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding TargetBedTimeHourDisplay}"
-                                               FontSize="22" FontAttributes="Bold" TextColor="#9B59B6"
-                                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Button Grid.Column="2" Text="+"
-                                                Command="{Binding IncrementBedHourCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                    </Grid>
-                                </Border>
-                            </VerticalStackLayout>
-
-                            <!-- Doppelpunkt -->
-                            <Label Grid.Column="1" Text=":"
-                                   FontSize="30" FontAttributes="Bold" TextColor="#9B59B6"
-                                   VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,8"/>
-
-                            <!-- Minuten-Picker -->
-                            <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
-                                <Label Text="Minuten" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
-                                <Border Stroke="#9B59B6" StrokeThickness="1.5" HorizontalOptions="Center">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="10"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="38,46,38" HeightRequest="46">
-                                        <Button Grid.Column="0" Text="−"
-                                                Command="{Binding DecrementBedMinuteCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding TargetBedTimeMinuteDisplay}"
-                                               FontSize="22" FontAttributes="Bold" TextColor="#9B59B6"
-                                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Button Grid.Column="2" Text="+"
-                                                Command="{Binding IncrementBedMinuteCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                    </Grid>
-                                </Border>
-                            </VerticalStackLayout>
-                        </Grid>
-                        <Label Text="{Binding TargetBedTimeDisplay}"
-                               FontSize="15" TextColor="Gray" HorizontalOptions="Center"/>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Ziel-Schlafenszeit"/>
+                        <TimePicker Time="{Binding TargetBedTime, Mode=TwoWay}"
+                                    Format="HH:mm"/>
                     </VerticalStackLayout>
 
                     <!-- Ziel-Aufwachzeit -->
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Ziel-Aufwachzeit" FontAttributes="Bold"/>
-                        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10" HorizontalOptions="Center" WidthRequest="270">
-
-                            <!-- Stunden-Picker -->
-                            <VerticalStackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
-                                <Label Text="Stunden" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
-                                <Border Stroke="#9B59B6" StrokeThickness="1.5" HorizontalOptions="Center">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="10"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="38,46,38" HeightRequest="46">
-                                        <Button Grid.Column="0" Text="−"
-                                                Command="{Binding DecrementWakeHourCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding TargetWakeTimeHourDisplay}"
-                                               FontSize="22" FontAttributes="Bold" TextColor="#9B59B6"
-                                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Button Grid.Column="2" Text="+"
-                                                Command="{Binding IncrementWakeHourCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                    </Grid>
-                                </Border>
-                            </VerticalStackLayout>
-
-                            <!-- Doppelpunkt -->
-                            <Label Grid.Column="1" Text=":"
-                                   FontSize="30" FontAttributes="Bold" TextColor="#9B59B6"
-                                   VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,8"/>
-
-                            <!-- Minuten-Picker -->
-                            <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
-                                <Label Text="Minuten" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
-                                <Border Stroke="#9B59B6" StrokeThickness="1.5" HorizontalOptions="Center">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="10"/>
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="38,46,38" HeightRequest="46">
-                                        <Button Grid.Column="0" Text="−"
-                                                Command="{Binding DecrementWakeMinuteCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding TargetWakeTimeMinuteDisplay}"
-                                               FontSize="22" FontAttributes="Bold" TextColor="#9B59B6"
-                                               HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Button Grid.Column="2" Text="+"
-                                                Command="{Binding IncrementWakeMinuteCommand}"
-                                                BackgroundColor="Transparent" TextColor="#9B59B6"
-                                                FontSize="22" FontAttributes="Bold" Padding="0" CornerRadius="0"/>
-                                    </Grid>
-                                </Border>
-                            </VerticalStackLayout>
-                        </Grid>
-                        <Label Text="{Binding TargetWakeTimeDisplay}"
-                               FontSize="15" TextColor="Gray" HorizontalOptions="Center"/>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Ziel-Aufwachzeit"/>
+                        <TimePicker Time="{Binding TargetWakeTime, Mode=TwoWay}"
+                                    Format="HH:mm"/>
                     </VerticalStackLayout>
 
                     <!-- Schlaf-Erinnerung -->
@@ -262,12 +152,13 @@
                                    HorizontalOptions="StartAndExpand"/>
                             <Switch IsToggled="{Binding SleepReminderEnabled}"/>
                         </HorizontalStackLayout>
-                        <Label Text="ℹ️ Sendet eine Benachrichtigung 1 Stunde vor der Ziel-Schlafenszeit."
-                               FontSize="11" TextColor="Gray"
+                        <Label Text="Sendet eine Benachrichtigung 1 Stunde vor der Ziel-Schlafenszeit."
+                               FontSize="11"
+                               TextColor="Gray"
                                IsVisible="{Binding SleepReminderEnabled}"/>
                     </VerticalStackLayout>
 
-                    <Button Text="😴 Schlaf-Einstellungen speichern"
+                    <Button Text="Schlaf-Einstellungen speichern"
                             Command="{Binding SaveSleepSettingsCommand}"
                             BackgroundColor="#9B59B6"
                             TextColor="White"
@@ -277,7 +168,7 @@
             </Frame>
 
             <!-- Logout Button -->
-            <Button Text="🚪 Abmelden"
+            <Button Text="Abmelden"
                     Command="{Binding LogoutCommand}"
                     BackgroundColor="#E74C3C"
                     TextColor="White"

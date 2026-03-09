@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Models;
 using MauiAbschlussprojekt.Services;
 
@@ -11,54 +12,75 @@ namespace MauiAbschlussprojekt.ViewModels
     {
         private readonly SleepApiService _sleepApiService;
 
-        // QueryProperties (werden vor OnAppearing gesetzt)
-        [ObservableProperty] private string bedTimeString = string.Empty;
-        [ObservableProperty] private string wakeTimeString = string.Empty;
-        [ObservableProperty] private int? entryId;
+        [ObservableProperty]
+        private DateTime bedTime = DateTime.Now.AddHours(-8);
 
-        // Berechnete Startwerte für die View
-        public DateTime BedTime { get; private set; } = DateTime.Today.AddHours(23);
-        public DateTime WakeTime { get; private set; } = DateTime.Today.AddDays(1).AddHours(7);
+        [ObservableProperty]
+        private DateTime wakeTime = DateTime.Now;
 
-        // Edit-Modus: Initialwerte für Code-Behind
-        public bool IsEditMode { get; private set; }
+        [ObservableProperty]
+        private bool isLoading;
+
+        [ObservableProperty]
+        private bool isEditMode;
+
+        [ObservableProperty]
+        private int? entryId;
+
+        [ObservableProperty]
+        private string bedTimeString = string.Empty;
+
+        [ObservableProperty]
+        private string wakeTimeString = string.Empty;
+
+        // ── Initial-Werte für den Code-Behind ──────────────────────────────
+        // Werden nach InitializeAsync() von OnAppearing() ausgelesen
+
         public int InitialSleepQuality { get; private set; } = 3;
+
+        /// <summary>Index in der Picker-Liste: Fast=0, Normal=1, Medium=2, Long=3</summary>
         public int InitialFallAsleepIndex { get; private set; } = 1;
+
         public string InitialDreamText { get; private set; } = string.Empty;
+
+        /// <summary>Index in der Picker-Liste: Positive=0, Neutral=1, Negative=2, Nightmare=3</summary>
         public int InitialDreamMoodIndex { get; private set; } = 1;
+
         public string InitialNotes { get; private set; } = string.Empty;
 
-        [ObservableProperty] private bool isLoading;
+        // ───────────────────────────────────────────────────────────────────
 
         public AddSleepEntryViewModel(SleepApiService sleepApiService)
         {
             _sleepApiService = sleepApiService;
         }
 
-        /// <summary>Wird von OnAppearing aufgerufen. Verarbeitet QueryProperties und lädt ggf. Edit-Daten.</summary>
         public async Task InitializeAsync()
         {
-            // QuickLog-Zeiten aus URL-Parametern parsen
-            if (!string.IsNullOrEmpty(BedTimeString) &&
-                DateTime.TryParse(BedTimeString, null,
-                    System.Globalization.DateTimeStyles.RoundtripKind, out var parsedBed))
-            {
-                BedTime = parsedBed.ToLocalTime();
-            }
+            // Zeiten aus Query-Parametern parsen (Format "yyyyMMddHHmm" vom QuickLog)
+            if (!string.IsNullOrEmpty(BedTimeString) && TryParseDateTime(BedTimeString, out var parsedBed))
+                BedTime = parsedBed;
 
-            if (!string.IsNullOrEmpty(WakeTimeString) &&
-                DateTime.TryParse(WakeTimeString, null,
-                    System.Globalization.DateTimeStyles.RoundtripKind, out var parsedWake))
-            {
-                WakeTime = parsedWake.ToLocalTime();
-            }
+            if (!string.IsNullOrEmpty(WakeTimeString) && TryParseDateTime(WakeTimeString, out var parsedWake))
+                WakeTime = parsedWake;
 
-            // Edit-Modus
             if (EntryId.HasValue)
             {
                 IsEditMode = true;
                 await LoadEntryAsync(EntryId.Value);
             }
+        }
+
+        private bool TryParseDateTime(string value, out DateTime result)
+        {
+            // Kompaktes URL-sicheres Format vom QuickLog: "yyyyMMddHHmm"
+            if (DateTime.TryParseExact(value, "yyyyMMddHHmm",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out result))
+                return true;
+
+            // Fallback für andere Formate
+            return DateTime.TryParse(value, out result);
         }
 
         private async Task LoadEntryAsync(int id)
@@ -67,38 +89,45 @@ namespace MauiAbschlussprojekt.ViewModels
             {
                 var entries = await _sleepApiService.GetRecentEntriesAsync(30);
                 var entry = entries.FirstOrDefault(e => e.Id == id);
-                if (entry == null) return;
 
-                BedTime = entry.BedTime.ToLocalTime();
-                WakeTime = entry.WakeTime.ToLocalTime();
-
-                InitialFallAsleepIndex = entry.FallAsleepDurationCategory switch
+                if (entry != null)
                 {
-                    "Fast" => 0,
-                    "Medium" => 2,
-                    "Long" => 3,
-                    _ => 1
-                };
+                    BedTime = entry.BedTime.ToLocalTime();
+                    WakeTime = entry.WakeTime.ToLocalTime();
 
-                InitialSleepQuality = entry.SleepQuality;
-                InitialDreamText = entry.DreamText ?? string.Empty;
-                InitialDreamMoodIndex = entry.DreamMood switch
-                {
-                    "Positive" => 0,
-                    "Negative" => 2,
-                    "Nightmare" => 3,
-                    _ => 1
-                };
-                InitialNotes = entry.Notes ?? string.Empty;
+                    InitialSleepQuality = entry.SleepQuality;
+
+                    InitialFallAsleepIndex = entry.FallAsleepDurationCategory switch
+                    {
+                        "Fast" => 0,
+                        "Medium" => 2,
+                        "Long" => 3,
+                        _ => 1  // Normal
+                    };
+
+                    InitialDreamText = entry.DreamText ?? string.Empty;
+
+                    InitialDreamMoodIndex = entry.DreamMood switch
+                    {
+                        "Positive" => 0,
+                        "Negative" => 2,
+                        "Nightmare" => 3,
+                        _ => 1  // Neutral
+                    };
+
+                    InitialNotes = entry.Notes ?? string.Empty;
+                }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Fehler",
-                    $"Eintrag konnte nicht geladen werden: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Fehler", $"Eintrag konnte nicht geladen werden: {ex.Message}", "OK");
             }
         }
 
-        /// <summary>Wird vom Code-Behind mit den finalen UI-Werten aufgerufen.</summary>
+        /// <summary>
+        /// Wird vom Code-Behind aufgerufen wenn der Save-Button gedrückt wird.
+        /// Alle Werte kommen direkt aus den UI-Controls (nicht per Binding).
+        /// </summary>
         public async Task SaveFromViewAsync(
             DateTime bedTime,
             DateTime wakeTime,
@@ -108,12 +137,18 @@ namespace MauiAbschlussprojekt.ViewModels
             string? dreamMood,
             string? notes)
         {
+            if (wakeTime <= bedTime)
+            {
+                await Shell.Current.DisplayAlert("Fehler", "Aufwachzeit muss nach der Einschlafzeit liegen", "OK");
+                return;
+            }
+
             IsLoading = true;
             try
             {
                 if (IsEditMode && EntryId.HasValue)
                 {
-                    var req = new UpdateSleepEntryRequest
+                    var request = new UpdateSleepEntryRequest
                     {
                         Id = EntryId.Value,
                         BedTime = bedTime.ToUniversalTime(),
@@ -124,15 +159,17 @@ namespace MauiAbschlussprojekt.ViewModels
                         DreamMood = dreamMood,
                         Notes = notes
                     };
-                    if (await _sleepApiService.UpdateSleepEntryAsync(req) != null)
+
+                    var result = await _sleepApiService.UpdateSleepEntryAsync(request);
+                    if (result != null)
                     {
-                        await Shell.Current.DisplayAlert("Erfolg", "Eintrag aktualisiert ✓", "OK");
+                        await Shell.Current.DisplayAlert("Erfolg", "Eintrag aktualisiert", "OK");
                         await Shell.Current.GoToAsync("..");
                     }
                 }
                 else
                 {
-                    var req = new AddSleepEntryRequest
+                    var request = new AddSleepEntryRequest
                     {
                         BedTime = bedTime.ToUniversalTime(),
                         WakeTime = wakeTime.ToUniversalTime(),
@@ -142,19 +179,23 @@ namespace MauiAbschlussprojekt.ViewModels
                         DreamMood = dreamMood,
                         Notes = notes
                     };
-                    if (await _sleepApiService.AddSleepEntryAsync(req) != null)
+
+                    var result = await _sleepApiService.AddSleepEntryAsync(request);
+                    if (result != null)
                     {
-                        await Shell.Current.DisplayAlert("Erfolg", "Nacht gespeichert! 🌙", "OK");
+                        await Shell.Current.DisplayAlert("Erfolg", "Eintrag gespeichert", "OK");
                         await Shell.Current.GoToAsync("..");
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Fehler",
-                    $"Fehler beim Speichern: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Speichern: {ex.Message}", "OK");
             }
-            finally { IsLoading = false; }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }

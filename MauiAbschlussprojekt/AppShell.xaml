@@ -7,16 +7,7 @@
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="#2C3E50">
 
-    <!-- Login / Register - im Flyout versteckt, aber als absolute Route erreichbar -->
-    <ShellContent Route="LoginPage"
-                  ContentTemplate="{DataTemplate views:LoginPage}"
-                  Shell.FlyoutItemIsVisible="False"/>
-
-    <ShellContent Route="RegisterPage"
-                  ContentTemplate="{DataTemplate views:RegisterPage}"
-                  Shell.FlyoutItemIsVisible="False"/>
-
-    <!-- Flyout Header -->
+    <!-- Flyout Header MUSS vor den Inhaltselementen stehen (XLS0509) -->
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="#34495E"
               Padding="20"
@@ -36,6 +27,28 @@
         </Grid>
     </Shell.FlyoutHeader>
 
+    <!-- Flyout Footer MUSS ebenfalls vor den Inhaltselementen stehen -->
+    <Shell.FlyoutFooter>
+        <Grid BackgroundColor="#1A252F"
+              Padding="20,10"
+              HeightRequest="60">
+            <Label Text="Version 1.0"
+                   FontSize="12"
+                   TextColor="White"
+                   Opacity="0.6"
+                   VerticalOptions="Center"/>
+        </Grid>
+    </Shell.FlyoutFooter>
+
+    <!-- Login / Register - im Flyout versteckt, aber als absolute Route erreichbar -->
+    <ShellContent Route="LoginPage"
+                  ContentTemplate="{DataTemplate views:LoginPage}"
+                  Shell.FlyoutItemIsVisible="False"/>
+
+    <ShellContent Route="RegisterPage"
+                  ContentTemplate="{DataTemplate views:RegisterPage}"
+                  Shell.FlyoutItemIsVisible="False"/>
+
     <!-- Flyout Items (Hauptmenü) -->
     <FlyoutItem Title="Wasser-Tracker"
                 Icon="drop.png">
@@ -54,18 +67,5 @@
         <ShellContent Route="Settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}" />
     </FlyoutItem>
-
-    <!-- Flyout Footer -->
-    <Shell.FlyoutFooter>
-        <Grid BackgroundColor="#1A252F"
-              Padding="20,10"
-              HeightRequest="60">
-            <Label Text="Version 1.0"
-                   FontSize="12"
-                   TextColor="White"
-                   Opacity="0.6"
-                   VerticalOptions="Center"/>
-        </Grid>
-    </Shell.FlyoutFooter>
 
 </Shell>
