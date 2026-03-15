@@ -48,6 +48,7 @@ namespace MauiAbschlussprojekt.ViewModels
 
         public ObservableCollection<DailySleepStatsDto> WeekStats { get; } = new();
         public ObservableCollection<DreamMoodCount> DreamMoodStats { get; } = new();
+        public ObservableCollection<SleepEntryDto> RecentEntries { get; } = new();  // NEU
 
         public SleepStatsViewModel(SleepApiService sleepApiService)
         {
@@ -66,17 +67,14 @@ namespace MauiAbschlussprojekt.ViewModels
 
             try
             {
-                // Load week stats
+                // Wochenstats laden
                 var weekStats = await _sleepApiService.GetWeekStatsAsync();
 
                 if (weekStats != null)
                 {
                     WeekStats.Clear();
-                    // weekStats.Days comes from server ordered oldest->newest; show newest first (yesterday on top)
                     foreach (var day in weekStats.Days.OrderByDescending(d => d.Date))
-                    {
                         WeekStats.Add(day);
-                    }
 
                     AverageSleepHours = weekStats.AverageSleepHours;
                     TargetSleepHours = weekStats.TargetSleepHours;
@@ -85,7 +83,7 @@ namespace MauiAbschlussprojekt.ViewModels
                     GoalMetDays = weekStats.GoalMetDays;
                 }
 
-                // Load detailed stats
+                // Detaillierte Stats laden (enthält RecentEntries)
                 var detailedStats = await _sleepApiService.GetDetailedStatsAsync(30);
 
                 if (detailedStats != null)
@@ -96,6 +94,11 @@ namespace MauiAbschlussprojekt.ViewModels
                     TotalDreams = detailedStats.TotalDreams;
                     BestNight = detailedStats.BestNight;
                     WorstNight = detailedStats.WorstNight;
+
+                    // RecentEntries befüllen (war vorher komplett vergessen)
+                    RecentEntries.Clear();
+                    foreach (var entry in detailedStats.RecentEntries.OrderByDescending(e => e.BedTime))
+                        RecentEntries.Add(entry);
 
                     DreamMoodStats.Clear();
                     foreach (var mood in detailedStats.DreamMoodCounts)
@@ -131,28 +134,22 @@ namespace MauiAbschlussprojekt.ViewModels
         public int Count { get; set; }
         public string DisplayText => $"{GetMoodEmoji(Mood)} {GetMoodText(Mood)}: {Count}";
 
-        private string GetMoodEmoji(string mood)
+        private string GetMoodEmoji(string mood) => mood switch
         {
-            return mood switch
-            {
-                "Positive" => "😊",
-                "Neutral" => "😐",
-                "Negative" => "😟",
-                "Nightmare" => "😱",
-                _ => "❓"
-            };
-        }
+            "Positive" => "😊",
+            "Neutral" => "😐",
+            "Negative" => "😟",
+            "Nightmare" => "😱",
+            _ => "❓"
+        };
 
-        private string GetMoodText(string mood)
+        private string GetMoodText(string mood) => mood switch
         {
-            return mood switch
-            {
-                "Positive" => "Positiv",
-                "Neutral" => "Neutral",
-                "Negative" => "Negativ",
-                "Nightmare" => "Albtraum",
-                _ => "Unbekannt"
-            };
-        }
+            "Positive" => "Positiv",
+            "Neutral" => "Neutral",
+            "Negative" => "Negativ",
+            "Nightmare" => "Albtraum",
+            _ => "Unbekannt"
+        };
     }
 }

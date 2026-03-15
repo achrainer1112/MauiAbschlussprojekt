@@ -19,26 +19,27 @@
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Grid.VisualStateManager.VisualStateGroups>
+                        <VisualStateManager.VisualStateGroups>
                             <VisualStateGroupList>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal">
                                         <VisualState.Setters>
-                                            <Setter Property="Grid.BackgroundColor" Value="Transparent"/>
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="Grid.BackgroundColor" Value="#2A3A4A"/>
+                                            <Setter Property="BackgroundColor" Value="#2A3A4A"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
                             </VisualStateGroupList>
-                        </Grid.VisualStateManager.VisualStateGroups>
+                        </VisualStateManager.VisualStateGroups>
                         <Image Grid.Column="0"
                                Source="{Binding FlyoutIcon}"
                                WidthRequest="22" HeightRequest="22"
-                               VerticalOptions="Center"/>
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"/>
                         <Label Grid.Column="1"
                                Text="{Binding Title}"
                                FontSize="15"
@@ -52,10 +53,8 @@
     </Shell.Resources>
 
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="#162032"
-              Padding="20,40,20,20"
-              HeightRequest="160">
-            <VerticalStackLayout VerticalOptions="End" Spacing="6">
+        <Grid BackgroundColor="#162032" Padding="20,16,20,20">
+            <VerticalStackLayout Spacing="6">
                 <Frame x:Name="AvatarFrame"
                        BackgroundColor="#1A73E8"
                        CornerRadius="28"
@@ -85,9 +84,7 @@
     </Shell.FlyoutHeader>
 
     <Shell.FlyoutFooter>
-        <Grid BackgroundColor="#111C2A"
-              Padding="20,12"
-              HeightRequest="50">
+        <Grid BackgroundColor="#111C2A" Padding="20,12" HeightRequest="50">
             <Label Text="Version 1.0"
                    FontSize="12"
                    TextColor="#4A6070"

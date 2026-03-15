@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using Models;
 using MauiAbschlussprojekt.Services;
 using System.Collections.ObjectModel;
-using Microsoft.Maui.ApplicationModel;
 
 namespace MauiAbschlussprojekt.ViewModels
 {
@@ -39,6 +38,10 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private string bedTimeDisplay = string.Empty;
 
+        // NEU: direkt als ObservableProperty statt berechnete Property
+        [ObservableProperty]
+        private double lastNightProgress;
+
         private DateTime _loggedBedTime;
 
         public ObservableCollection<SleepEntryDto> RecentEntries { get; } = new();
@@ -51,8 +54,9 @@ namespace MauiAbschlussprojekt.ViewModels
 
         public async Task InitializeAsync()
         {
-            Username = _apiService.CurrentUser?.Username ?? "User";
-            TargetSleepHours = _apiService.CurrentUser?.TargetSleepHours ?? 8.0;
+            var freshUser = await _apiService.GetUserAsync();
+            Username = freshUser?.Username ?? _apiService.CurrentUser?.Username ?? "User";
+            TargetSleepHours = freshUser?.TargetSleepHours ?? _apiService.CurrentUser?.TargetSleepHours ?? 8.0;
             await LoadDataAsync();
         }
 
@@ -62,27 +66,20 @@ namespace MauiAbschlussprojekt.ViewModels
             IsLoading = true;
             try
             {
-                // Prefer detailed stats endpoint which includes recent entries (often more reliable)
                 var detailed = await _sleepApiService.GetDetailedStatsAsync(30);
-                List<SleepEntryDto> entries = null;
+                List<SleepEntryDto> entries;
 
                 if (detailed != null && detailed.RecentEntries != null && detailed.RecentEntries.Any())
-                {
                     entries = detailed.RecentEntries;
-                }
                 else
-                {
                     entries = await _sleepApiService.GetRecentEntriesAsync(7);
-                }
 
-                // Ensure newest entries are first (descending by BedTime)
                 entries = entries.OrderByDescending(e => e.BedTime).ToList();
 
                 RecentEntries.Clear();
                 foreach (var entry in entries)
                     RecentEntries.Add(entry);
 
-                // The first entry is the most recent (last night)
                 var lastNight = entries.FirstOrDefault();
                 if (lastNight != null)
                 {
@@ -90,11 +87,17 @@ namespace MauiAbschlussprojekt.ViewModels
                     LastNightSleepHours = lastNight.TotalSleepHours;
                     LastNightQuality = lastNight.SleepQuality;
                     LastNightSummary = $"{lastNight.TotalSleepHours:F1}h geschlafen • {GetQualityText(lastNight.SleepQuality)}";
+
+                    // Progress direkt berechnen und setzen
+                    LastNightProgress = TargetSleepHours > 0
+                        ? Math.Min(lastNight.TotalSleepHours / TargetSleepHours, 1.0)
+                        : 0.0;
                 }
                 else
                 {
                     HasLastNightData = false;
                     LastNightSummary = "Noch keine Daten";
+                    LastNightProgress = 0.0;
                 }
             }
             catch (Exception ex)
@@ -125,14 +128,11 @@ namespace MauiAbschlussprojekt.ViewModels
             }
 
             var wakeTime = DateTime.Now;
-
-            // URL-sicheres Format: "yyyyMMddHHmm" — keine Sonderzeichen
             var bedParam = _loggedBedTime.ToString("yyyyMMddHHmm");
             var wakeParam = wakeTime.ToString("yyyyMMddHHmm");
 
             await Shell.Current.GoToAsync($"AddSleepEntryPage?bedTime={bedParam}&wakeTime={wakeParam}");
 
-            // Reset für nächste Nacht
             BedTimeLogged = false;
             BedTimeDisplay = string.Empty;
         }
@@ -144,9 +144,9 @@ namespace MauiAbschlussprojekt.ViewModels
         }
 
         [RelayCommand]
-        private async Task ViewEntryDetailsAsync(SleepEntryDto entry)
+        private async Task NavigateToStatsAsync()
         {
-            await Shell.Current.GoToAsync($"AddSleepEntryPage?entryId={entry.Id}");
+            await Shell.Current.GoToAsync("SleepStatsPage");
         }
 
         [RelayCommand]
@@ -155,8 +155,7 @@ namespace MauiAbschlussprojekt.ViewModels
             bool confirm = await Shell.Current.DisplayAlert(
                 "Löschen",
                 $"Eintrag vom {entry.BedTime:dd.MM.yyyy} wirklich löschen?",
-                "Ja",
-                "Nein");
+                "Ja", "Nein");
 
             if (!confirm) return;
 
@@ -176,12 +175,12 @@ namespace MauiAbschlussprojekt.ViewModels
         }
 
         [RelayCommand]
-        private async Task NavigateToStatsAsync()
+        private async Task ViewEntryDetailsAsync(SleepEntryDto entry)
         {
-            await Shell.Current.GoToAsync("SleepStatsPage");
+            await Shell.Current.GoToAsync($"AddSleepEntryPage?entryId={entry.Id}");
         }
 
-        private string GetQualityText(int quality) => quality switch
+        private static string GetQualityText(int quality) => quality switch
         {
             5 => "Ausgezeichnet",
             4 => "Gut",

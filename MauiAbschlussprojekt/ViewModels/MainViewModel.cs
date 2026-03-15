@@ -54,8 +54,10 @@ namespace MauiAbschlussprojekt.ViewModels
 
         public async Task InitializeAsync()
         {
-            Username = _apiService.CurrentUser?.Username ?? "User";
-            GoalMl = _apiService.CurrentUser?.DailyWaterGoalMl ?? 2000;
+            // Frisch vom Server laden statt gecachtes CurrentUser verwenden
+            var freshUser = await _apiService.GetUserAsync();
+            Username = freshUser?.Username ?? _apiService.CurrentUser?.Username ?? "User";
+            GoalMl = freshUser?.DailyWaterGoalMl ?? _apiService.CurrentUser?.DailyWaterGoalMl ?? 2000;
             await LoadTodayDataAsync();
         }
 

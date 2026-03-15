@@ -15,6 +15,7 @@
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
                   ColumnSpacing="12" RowSpacing="12">
 
+                <!-- Ø Schlaf -->
                 <Border Grid.Column="0" Grid.Row="0" BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
@@ -28,9 +29,12 @@
                         <Label Text="{Binding AverageSleepHours, StringFormat='{0:F1} h'}"
                                FontSize="22" FontAttributes="Bold" TextColor="#7C3AED"/>
                         <Label Text="pro Nacht" FontSize="12" TextColor="#9EAAB6"/>
+                        <Label Text="{Binding TargetSleepHours, StringFormat='Ziel: {0:F1} h'}"
+                               FontSize="11" TextColor="#1A73E8" FontAttributes="Bold"/>
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Streak -->
                 <Border Grid.Column="1" Grid.Row="0" BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
@@ -47,6 +51,7 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Qualität -->
                 <Border Grid.Column="0" Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
@@ -63,6 +68,7 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Bester Streak -->
                 <Border Grid.Column="1" Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
@@ -80,7 +86,7 @@
                 </Border>
             </Grid>
 
-            <!-- Letzte Einträge -->
+            <!-- Letzte Nächte -->
             <Label Text="LETZTE NÄCHTE" FontSize="11" FontAttributes="Bold"
                    TextColor="#9EAAB6" CharacterSpacing="1" Margin="4,4,4,0"/>
 
@@ -102,10 +108,8 @@
                                 <Shadow Brush="#1A2535" Opacity="0.05" Radius="6" Offset="0,2"/>
                             </Border.Shadow>
                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="14,12">
-                                <Frame Grid.Column="0"
-                                       BackgroundColor="#EDE9FE" CornerRadius="10"
-                                       WidthRequest="42" HeightRequest="42"
-                                       HasShadow="False" Padding="0">
+                                <Frame Grid.Column="0" BackgroundColor="#EDE9FE" CornerRadius="10"
+                                       WidthRequest="42" HeightRequest="42" HasShadow="False" Padding="0">
                                     <Label Text="🌙" FontSize="18"
                                            HorizontalOptions="Center" VerticalOptions="Center"/>
                                 </Frame>
@@ -119,12 +123,6 @@
                                         <Label Text="{Binding GoalStatusText}"
                                                FontSize="12" TextColor="#6C757D"/>
                                     </HorizontalStackLayout>
-                                    <Border BackgroundColor="#F0EBFF" StrokeThickness="0"
-                                            HeightRequest="6" HorizontalOptions="Fill">
-                                        <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="3"/>
-                                        </Border.StrokeShape>
-                                    </Border>
                                 </VerticalStackLayout>
                                 <Label Grid.Column="2"
                                        Text="{Binding SleepQuality, StringFormat='⭐{0}'}"
@@ -137,5 +135,4 @@
 
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

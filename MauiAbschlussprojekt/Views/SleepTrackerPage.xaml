@@ -22,20 +22,11 @@
             <Grid ColumnDefinitions="*,Auto" Padding="4,0">
                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                     <Label Text="{Binding Username, StringFormat='Gute Nacht, {0} 🌙'}"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1A2535"/>
-                    <Label Text="Verfolge deinen Schlaf"
-                           FontSize="13"
-                           TextColor="#6C757D"/>
+                           FontSize="20" FontAttributes="Bold" TextColor="#1A2535"/>
+                    <Label Text="Verfolge deinen Schlaf" FontSize="13" TextColor="#6C757D"/>
                 </VerticalStackLayout>
-                <Frame Grid.Column="1"
-                       BackgroundColor="#2D1B69"
-                       CornerRadius="20"
-                       WidthRequest="40"
-                       HeightRequest="40"
-                       HasShadow="False"
-                       Padding="0">
+                <Frame Grid.Column="1" BackgroundColor="#2D1B69" CornerRadius="20"
+                       WidthRequest="40" HeightRequest="40" HasShadow="False" Padding="0">
                     <Label Text="😴" FontSize="18"
                            HorizontalOptions="Center" VerticalOptions="Center"/>
                 </Frame>
@@ -51,49 +42,41 @@
                 </Border.Shadow>
                 <Grid Padding="18">
                     <VerticalStackLayout Spacing="10" IsVisible="{Binding HasLastNightData}">
-                        <Label Text="LETZTE NACHT"
-                               FontSize="11" FontAttributes="Bold"
+                        <Label Text="LETZTE NACHT" FontSize="11" FontAttributes="Bold"
                                TextColor="#9EAAB6" CharacterSpacing="1"/>
                         <Label Text="{Binding LastNightSummary}"
                                FontSize="17" FontAttributes="Bold" TextColor="#1A2535"/>
                         <Label Text="{Binding LastNightQuality, StringFormat='Qualität: ⭐ {0}/5'}"
                                FontSize="13" TextColor="#F39C12"/>
-                        <!-- Schlaf-Fortschrittsbalken -->
-                        <Grid ColumnDefinitions="*" HeightRequest="8" Margin="0,4,0,0">
-                            <Border BackgroundColor="#EBF2FF" StrokeThickness="0">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                            </Border>
-                            <Border BackgroundColor="#7C3AED" StrokeThickness="0"
-                                    HorizontalOptions="Start"
-                                    WidthRequest="{Binding LastNightProgressWidth}">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                            </Border>
-                        </Grid>
+
+                        <!-- Fortschrittsbalken -->
+                        <VerticalStackLayout Spacing="4" Margin="0,4,0,0">
+                            <ProgressBar Progress="{Binding LastNightProgress}"
+                                         ProgressColor="#7C3AED"
+                                         BackgroundColor="#EBF2FF"
+                                         HeightRequest="8"/>
+                            <Label Text="{Binding TargetSleepHours, StringFormat='Ziel: {0:F1} h'}"
+                                   FontSize="11" TextColor="#9EAAB6"
+                                   HorizontalOptions="End"/>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
+
                     <Label Text="Noch keine Schlafdaten für heute Nacht"
                            IsVisible="{Binding HasLastNightData, Converter={StaticResource InvertedBoolConverter}}"
-                           TextColor="#9EAAB6"
-                           FontSize="14"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
+                           TextColor="#9EAAB6" FontSize="14"
+                           HorizontalOptions="Center" VerticalOptions="Center"
                            Padding="0,20"/>
                 </Grid>
             </Border>
 
             <!-- Schnellaktionen -->
-            <Label Text="Schnellaktionen"
-                   FontSize="15" FontAttributes="Bold"
+            <Label Text="Schnellaktionen" FontSize="15" FontAttributes="Bold"
                    TextColor="#1A2535" Margin="4,0"/>
 
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
 
                 <!-- Ins Bett -->
-                <Border Grid.Column="0"
-                        StrokeThickness="2"
+                <Border Grid.Column="0" StrokeThickness="2"
                         Stroke="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='#2D1B69', FalseObject='#7C3AED'}}"
                         BackgroundColor="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='#EDE9FE', FalseObject='White'}}"
                         Opacity="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='0.6', FalseObject='1.0'}}">
@@ -115,8 +98,7 @@
                 </Border>
 
                 <!-- Aufgewacht -->
-                <Border Grid.Column="1"
-                        StrokeThickness="2"
+                <Border Grid.Column="1" StrokeThickness="2"
                         Stroke="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='#1A73E8', FalseObject='#D0DAE6'}}"
                         BackgroundColor="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='White', FalseObject='#F8FAFC'}}"
                         Opacity="{Binding BedTimeLogged, Converter={toolkit:BoolToObjectConverter TrueObject='1.0', FalseObject='0.45'}}">
@@ -136,7 +118,6 @@
                         <Label Text="Jetzt" FontSize="11" TextColor="#9EAAB6" HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </Border>
-
             </Grid>
 
             <!-- Hinweis wenn Einschlafzeit gespeichert -->
@@ -145,7 +126,8 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10"/>
                 </Border.StrokeShape>
-                <Label FontSize="13" TextColor="#5B21B6" HorizontalOptions="Center" HorizontalTextAlignment="Center">
+                <Label FontSize="13" TextColor="#5B21B6"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="🛏️ Einschlafzeit gespeichert: "/>
@@ -170,8 +152,7 @@
                     CornerRadius="12" HeightRequest="48"/>
 
             <!-- Letzte Einträge -->
-            <Label Text="Letzte Einträge"
-                   FontSize="15" FontAttributes="Bold"
+            <Label Text="Letzte Einträge" FontSize="15" FontAttributes="Bold"
                    TextColor="#1A2535" Margin="4,4,4,0"/>
 
             <RefreshView Command="{Binding LoadDataCommand}">
@@ -193,10 +174,8 @@
                                     <Shadow Brush="#1A2535" Opacity="0.05" Radius="6" Offset="0,2"/>
                                 </Border.Shadow>
                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="14,12">
-                                    <Frame Grid.Column="0"
-                                           BackgroundColor="#EDE9FE" CornerRadius="10"
-                                           WidthRequest="42" HeightRequest="42"
-                                           HasShadow="False" Padding="0">
+                                    <Frame Grid.Column="0" BackgroundColor="#EDE9FE" CornerRadius="10"
+                                           WidthRequest="42" HeightRequest="42" HasShadow="False" Padding="0">
                                         <Label Text="🌙" FontSize="18"
                                                HorizontalOptions="Center" VerticalOptions="Center"/>
                                     </Frame>
@@ -217,10 +196,9 @@
             </RefreshView>
 
             <ActivityIndicator IsRunning="{Binding IsLoading}"
-                             IsVisible="{Binding IsLoading}"
-                             Color="#7C3AED" Margin="20"/>
+                               IsVisible="{Binding IsLoading}"
+                               Color="#7C3AED" Margin="20"/>
 
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

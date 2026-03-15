@@ -66,6 +66,7 @@ namespace Models
 
     public class UpdateUserRequest
     {
+        public string? Username { get; set; }
         public double? WeightKg { get; set; }
         public string? ActivityLevel { get; set; }
         public int? DailyWaterGoalMl { get; set; }

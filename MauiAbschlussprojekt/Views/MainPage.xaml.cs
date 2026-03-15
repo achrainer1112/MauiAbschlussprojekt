@@ -41,16 +41,13 @@ namespace MauiAbschlussprojekt.Views
         }
     }
 
-    /// <summary>
-    /// Zeichnet einen Arc-Fortschrittskreis mit MAUI Graphics.
-    /// </summary>
     public class WaterArcDrawable : IDrawable
     {
-        private readonly double _progress; // 0.0 – 1.0
+        private readonly double _progress; // 0.0 – 1.0+
 
         public WaterArcDrawable(double progress)
         {
-            _progress = Math.Clamp(progress, 0.0, 1.0);
+            _progress = Math.Max(progress, 0.0); // kein Clamp nach oben!
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -64,16 +61,23 @@ namespace MauiAbschlussprojekt.Views
             float top = cy - radius;
             float size = radius * 2f;
 
-            // 1. Hintergrundkreis — grau (leerer Bereich)
+            // 1. Hintergrundkreis — immer grau
             canvas.StrokeColor = Color.FromArgb("#E8EDF2");
             canvas.StrokeSize = strokeWidth;
             canvas.StrokeLineCap = LineCap.Round;
             canvas.DrawCircle(cx, cy, radius);
 
-            if (_progress >= 1)
+            // 2. Bei 100%+ → kompletten Kreis blau zeichnen
+            if (_progress >= 1.0)
+            {
+                canvas.StrokeColor = Color.FromArgb("#1A73E8");
+                canvas.StrokeSize = strokeWidth;
+                canvas.StrokeLineCap = LineCap.Round;
+                canvas.DrawCircle(cx, cy, radius);
                 return;
+            }
 
-            // 2. Leerer Arc — grau, zeigt den noch nicht gefüllten Teil
+            // 3. Teilweise gefüllt → blauer Arc
             float filledAngle = (float)(_progress * 360.0);
             float emptyAngle = 360f - filledAngle;
 

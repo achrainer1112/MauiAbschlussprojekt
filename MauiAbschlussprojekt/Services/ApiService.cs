@@ -162,28 +162,41 @@ namespace MauiAbschlussprojekt.Services
         public async Task<UserDto?> UpdateUserAsync(UpdateUserRequest request)
         {
             if (!CurrentUserId.HasValue)
+            {
+                System.Diagnostics.Debug.WriteLine("UpdateUserAsync: CurrentUserId is null!");
                 return null;
+            }
 
             try
             {
                 SetAuthHeader();
                 var json = JsonConvert.SerializeObject(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Sending to {BaseUrl}/user/update?userId={CurrentUserId}");
+                System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Body = {json}");
 
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PutAsync($"{BaseUrl}/user/update?userId={CurrentUserId}", content);
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Status = {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Response = {responseContent}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
                     var user = JsonConvert.DeserializeObject<UserDto>(responseContent);
                     CurrentUser = user;
                     return user;
                 }
 
+                // Fehlermeldung dem User zeigen
+                await Shell.Current.DisplayAlert("API Fehler",
+                    $"Status: {response.StatusCode}\n{responseContent}", "OK");
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"UpdateUserAsync Exception: {ex.Message}");
+                await Shell.Current.DisplayAlert("Verbindungsfehler", ex.Message, "OK");
                 return null;
             }
         }

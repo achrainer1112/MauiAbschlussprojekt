@@ -16,26 +16,26 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/user/{userId}
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserDto>> GetUser(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
             return Ok(MapToUserDto(user));
         }
 
-        // PUT: api/user/update
         [HttpPut("update")]
         public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UpdateUserRequest request, [FromQuery] int userId)
         {
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
+
+            // Username aktualisieren (neu)
+            if (!string.IsNullOrWhiteSpace(request.Username))
+                user.Username = request.Username;
 
             if (request.WeightKg.HasValue)
                 user.WeightKg = request.WeightKg;
@@ -64,12 +64,10 @@ namespace WebAPI.Controllers
             return Ok(MapToUserDto(user));
         }
 
-        // PUT: api/user/reminder-settings
         [HttpPut("reminder-settings")]
         public async Task<ActionResult<UserDto>> UpdateReminderSettings([FromBody] UpdateReminderRequest request, [FromQuery] int userId)
         {
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
@@ -89,12 +87,10 @@ namespace WebAPI.Controllers
             return Ok(MapToUserDto(user));
         }
 
-        // PUT: api/user/sleep-settings
         [HttpPut("sleep-settings")]
         public async Task<ActionResult<UserDto>> UpdateSleepSettings([FromBody] UpdateSleepSettingsRequest request, [FromQuery] int userId)
         {
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 

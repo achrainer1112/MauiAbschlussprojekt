@@ -131,6 +131,7 @@ namespace WebAPI.Controllers
             return Ok(new { message = "Eintrag gelöscht" });
         }
 
+
         // GET: api/sleep/stats/week/{userId}
         [HttpGet("stats/week/{userId}")]
         public async Task<ActionResult<WeekSleepStatsDto>> GetWeekStats(int userId)
@@ -143,16 +144,16 @@ namespace WebAPI.Controllers
             var today = DateTime.UtcNow.Date;
             var weekAgo = today.AddDays(-6);
 
-            var entries = await _context.SleepEntries
+            // Letzte 7 Tage für die Tageskacheln
+            var weekEntries = await _context.SleepEntries
                 .Where(s => s.UserId == userId && s.BedTime.Date >= weekAgo && s.BedTime.Date <= today)
                 .ToListAsync();
 
             var dailyStats = new List<DailySleepStatsDto>();
-
             for (int i = 6; i >= 0; i--)
             {
                 var date = today.AddDays(-i);
-                var dayEntry = entries.FirstOrDefault(e => e.BedTime.Date == date);
+                var dayEntry = weekEntries.FirstOrDefault(e => e.BedTime.Date == date);
 
                 if (dayEntry != null)
                 {
@@ -179,41 +180,67 @@ namespace WebAPI.Controllers
                 }
             }
 
-            // Calculate streaks
-            int currentStreak = 0;
-            int bestStreak = 0;
-            int tempStreak = 0;
+            // === STREAK: Alle Einträge laden, nicht nur letzte 7 Tage ===
+            var allEntries = await _context.SleepEntries
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.BedTime)
+                .ToListAsync();
 
-            // Current Streak (von heute rückwärts)
-            for (int i = 6; i >= 0; i--)
+            // Current Streak: von heute rückwärts, Tag für Tag prüfen
+            int currentStreak = 0;
+            var checkDate = today;
+
+            // Erlaube auch gestern als Startpunkt (falls heute noch kein Eintrag)
+            var hasToday = allEntries.Any(e => e.BedTime.Date == today && e.TotalSleepHours >= targetHours);
+            var hasYesterday = allEntries.Any(e => e.BedTime.Date == today.AddDays(-1) && e.TotalSleepHours >= targetHours);
+
+            if (!hasToday && !hasYesterday)
             {
-                if (dailyStats[i].GoalMet)
+                currentStreak = 0;
+            }
+            else
+            {
+                if (!hasToday)
+                    checkDate = today.AddDays(-1); // Streak startet gestern
+
+                while (true)
                 {
-                    if (i == 6) // Heute
+                    var met = allEntries.Any(e => e.BedTime.Date == checkDate && e.TotalSleepHours >= targetHours);
+                    if (met)
+                    {
                         currentStreak++;
-                    else if (currentStreak > 0)
-                        currentStreak++;
+                        checkDate = checkDate.AddDays(-1);
+                    }
                     else
+                    {
                         break;
-                }
-                else if (currentStreak > 0)
-                {
-                    break;
+                    }
                 }
             }
 
-            // Best Streak
-            foreach (var day in dailyStats)
+            // Best Streak: alle Einträge chronologisch durchgehen
+            int bestStreak = 0;
+            int tempStreak = 0;
+
+            if (allEntries.Any())
             {
-                if (day.GoalMet)
+                var minDate = allEntries.Min(e => e.BedTime.Date);
+                var cursor = minDate;
+
+                while (cursor <= today)
                 {
-                    tempStreak++;
-                    if (tempStreak > bestStreak)
-                        bestStreak = tempStreak;
-                }
-                else
-                {
-                    tempStreak = 0;
+                    var met = allEntries.Any(e => e.BedTime.Date == cursor && e.TotalSleepHours >= targetHours);
+                    if (met)
+                    {
+                        tempStreak++;
+                        if (tempStreak > bestStreak)
+                            bestStreak = tempStreak;
+                    }
+                    else
+                    {
+                        tempStreak = 0;
+                    }
+                    cursor = cursor.AddDays(1);
                 }
             }
 
