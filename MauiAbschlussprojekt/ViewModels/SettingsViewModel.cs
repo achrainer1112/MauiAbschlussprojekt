@@ -251,6 +251,11 @@ namespace MauiAbschlussprojekt.ViewModels
 
                 var result = await _apiService.UpdateReminderSettingsAsync(request);
 
+                if (ReminderEnabled)
+                    _reminderService.StartPeriodicNotifications(interval, startHour, endHour);
+                else
+                    _reminderService.StopPeriodicNotifications();
+
                 if (result != null)
                     await Shell.Current.DisplayAlert("Erfolg", "Wasser-Einstellungen gespeichert ✓", "OK");
                 else
