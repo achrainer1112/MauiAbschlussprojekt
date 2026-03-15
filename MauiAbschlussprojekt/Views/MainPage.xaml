@@ -5,175 +5,195 @@
              xmlns:models="clr-namespace:Models;assembly=Models"
              x:Class="MauiAbschlussprojekt.Views.MainPage"
              x:DataType="viewmodels:MainViewModel"
-             Title="💧 Wasser-Tracker">
+             Title="Wasser-Tracker"
+             BackgroundColor="#F0F4F8">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
+        <VerticalStackLayout Padding="16,12" Spacing="14">
 
             <!-- Header -->
-            <Label Text="{Binding Username, StringFormat='Hallo, {0}!'}"
-                   FontSize="22"
-                   FontAttributes="Bold"/>
-
-            <!-- Progress -->
-            <Frame BorderColor="#3498DB" CornerRadius="15" Padding="15" HasShadow="True">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="{Binding TotalMl, StringFormat='{0} ml'}"
-                           FontSize="32"
-                           FontAttributes="Bold"
-                           TextColor="#3498DB"
-                           HorizontalOptions="Center"/>
-                    <Label Text="{Binding GoalMl, StringFormat='von {0} ml Tagesziel'}"
-                           FontSize="14"
-                           TextColor="Gray"
-                           HorizontalOptions="Center"/>
-                    <ProgressBar Progress="{Binding ProgressPercentage}"
-                                 HeightRequest="20"
-                                 ProgressColor="#3498DB"/>
-                    <Label Text="{Binding ProgressText}"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#27AE60"
-                           HorizontalOptions="Center"/>
+            <Grid ColumnDefinitions="*,Auto" Padding="4,0">
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Text="{Binding Username, StringFormat='Hallo, {0} 👋'}"
+                           FontSize="20" FontAttributes="Bold" TextColor="#1A2535"/>
+                    <Label Text="Trink heute genug!"
+                           FontSize="13" TextColor="#6C757D"/>
                 </VerticalStackLayout>
-            </Frame>
+                <Frame Grid.Column="1"
+                       BackgroundColor="#1A73E8"
+                       CornerRadius="20" WidthRequest="40" HeightRequest="40"
+                       HasShadow="False" Padding="0">
+                    <Label Text="💧" FontSize="18"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Frame>
+            </Grid>
 
-            <!-- Quick Add Buttons -->
-            <Label Text="Schnell hinzufügen:"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   Margin="0,10,0,0"/>
+            <!-- Wasser-Fortschritt Card mit GraphicsView Arc -->
+            <Border BackgroundColor="White" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="12" Offset="0,4"/>
+                </Border.Shadow>
+                <VerticalStackLayout Padding="20" Spacing="12">
+
+                    <!-- GraphicsView Kreis -->
+                    <Grid WidthRequest="200" HeightRequest="200"
+                          HorizontalOptions="Center">
+
+                        <!-- Arc wird vom Code-Behind gezeichnet -->
+                        <GraphicsView x:Name="WaterCircle"
+                                      WidthRequest="200"
+                                      HeightRequest="200"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center"/>
+
+                        <!-- Text im Zentrum -->
+                        <VerticalStackLayout VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Spacing="2">
+                            <Label Text="{Binding TotalMl}"
+                                   FontSize="34" FontAttributes="Bold"
+                                   TextColor="#1A2535" HorizontalOptions="Center"/>
+                            <Label Text="ml"
+                                   FontSize="13" TextColor="#6C757D"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="{Binding ProgressText}"
+                                   FontSize="13" FontAttributes="Bold"
+                                   TextColor="#1A73E8" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label Text="{Binding GoalMl, StringFormat='Tagesziel: {0} ml'}"
+                           FontSize="13" TextColor="#6C757D"
+                           HorizontalOptions="Center"/>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Schnell hinzufügen -->
+            <Label Text="Schnell hinzufügen"
+                   FontSize="15" FontAttributes="Bold"
+                   TextColor="#1A2535" Margin="4,0"/>
 
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
-                <Button Grid.Column="0"
-                        Text="250ml"
-                        Command="{Binding QuickAddWaterCommand}"
-                        CommandParameter="250"
-                        BackgroundColor="#3498DB"
-                        TextColor="White"
-                        CornerRadius="10"/>
-                <Button Grid.Column="1"
-                        Text="500ml"
-                        Command="{Binding QuickAddWaterCommand}"
-                        CommandParameter="500"
-                        BackgroundColor="#3498DB"
-                        TextColor="White"
-                        CornerRadius="10"/>
-                <Button Grid.Column="2"
-                        Text="750ml"
-                        Command="{Binding QuickAddWaterCommand}"
-                        CommandParameter="750"
-                        BackgroundColor="#3498DB"
-                        TextColor="White"
-                        CornerRadius="10"/>
-                <Button Grid.Column="3"
-                        Text="1000ml"
-                        Command="{Binding QuickAddWaterCommand}"
-                        CommandParameter="1000"
-                        BackgroundColor="#3498DB"
-                        TextColor="White"
-                        CornerRadius="10"/>
+                <Button Grid.Column="0" Text="250 ml"
+                        Command="{Binding QuickAddWaterCommand}" CommandParameter="250"
+                        BackgroundColor="#1A73E8" TextColor="White"
+                        CornerRadius="12" FontSize="13" HeightRequest="46"/>
+                <Button Grid.Column="1" Text="500 ml"
+                        Command="{Binding QuickAddWaterCommand}" CommandParameter="500"
+                        BackgroundColor="#1A73E8" TextColor="White"
+                        CornerRadius="12" FontSize="13" HeightRequest="46"/>
+                <Button Grid.Column="2" Text="750 ml"
+                        Command="{Binding QuickAddWaterCommand}" CommandParameter="750"
+                        BackgroundColor="#1A73E8" TextColor="White"
+                        CornerRadius="12" FontSize="13" HeightRequest="46"/>
+                <Button Grid.Column="3" Text="1 L"
+                        Command="{Binding QuickAddWaterCommand}" CommandParameter="1000"
+                        BackgroundColor="#1A73E8" TextColor="White"
+                        CornerRadius="12" FontSize="13" HeightRequest="46"/>
             </Grid>
 
-            <!-- Custom Amount -->
-            <Label Text="Eigene Menge:"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   Margin="0,10,0,0"/>
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                <Entry Grid.Column="0"
-                       Placeholder="Menge in ml"
-                       Text="{Binding CustomAmountInput}"
-                       Keyboard="Numeric"
-                       ReturnCommand="{Binding AddCustomAmountCommand}"/>
-                <Button Grid.Column="1"
-                        Text="Hinzufügen"
-                        Command="{Binding AddCustomAmountCommand}"
-                        BackgroundColor="#27AE60"
-                        TextColor="White"
-                        CornerRadius="10"
-                        Padding="20,0"/>
-            </Grid>
+            <!-- Eigene Menge -->
+            <Border BackgroundColor="White" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.06" Radius="8" Offset="0,3"/>
+                </Border.Shadow>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Padding="14">
+                    <Entry Grid.Column="0"
+                           Placeholder="Eigene Menge in ml"
+                           Text="{Binding CustomAmountInput}"
+                           Keyboard="Numeric"
+                           ReturnCommand="{Binding AddCustomAmountCommand}"
+                           FontSize="15" TextColor="#1A2535"
+                           PlaceholderColor="#9EAAB6"
+                           BackgroundColor="Transparent"/>
+                    <Button Grid.Column="1"
+                            Text="+"
+                            Command="{Binding AddCustomAmountCommand}"
+                            BackgroundColor="#1A73E8" TextColor="White"
+                            CornerRadius="10" WidthRequest="46" HeightRequest="46"
+                            FontSize="20" FontAttributes="Bold" Padding="0"/>
+                </Grid>
+            </Border>
 
-            <!-- Stats Button -->
-            <Button Text="📊 Statistiken anzeigen"
+            <!-- Statistiken -->
+            <Button Text="📊  Statistiken"
                     Command="{Binding NavigateToStatsCommand}"
-                    BackgroundColor="#9B59B6"
-                    TextColor="White"
-                    CornerRadius="10"
-                    HeightRequest="50"
-                    Margin="0,10,0,0"/>
+                    BackgroundColor="#EBF2FF" TextColor="#1A73E8"
+                    FontAttributes="Bold" FontSize="15"
+                    CornerRadius="12" HeightRequest="48"/>
 
-            <!-- Today's Entries -->
-            <Label Text="Heutige Einträge:"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   Margin="0,15,0,0"/>
+            <!-- Heutige Einträge -->
+            <Label Text="Heutige Einträge"
+                   FontSize="15" FontAttributes="Bold"
+                   TextColor="#1A2535" Margin="4,4,4,0"/>
 
             <RefreshView IsRefreshing="{Binding IsRefreshing}"
-                        Command="{Binding LoadTodayDataCommand}">
+                         Command="{Binding LoadTodayDataCommand}">
                 <CollectionView ItemsSource="{Binding TodayEntries}">
                     <CollectionView.EmptyView>
-                        <VerticalStackLayout Padding="40" Spacing="10">
-                            <Label Text="💧"
-                                   FontSize="60"
-                                   HorizontalOptions="Center"/>
+                        <VerticalStackLayout Padding="30" Spacing="8">
+                            <Label Text="💧" FontSize="44" HorizontalOptions="Center"/>
                             <Label Text="Noch keine Einträge heute"
-                                   FontSize="14"
-                                   TextColor="Gray"
+                                   FontSize="14" TextColor="#9EAAB6"
                                    HorizontalOptions="Center"/>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
-
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:WaterEntryDto">
-                            <Frame BorderColor="LightGray" 
-                                   CornerRadius="10" 
-                                   Padding="12" 
-                                   Margin="0,0,0,8"
-                                   HasShadow="True">
-                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
-                                    <VerticalStackLayout Grid.Column="0">
+                            <Border BackgroundColor="White" StrokeThickness="0" Margin="0,0,0,8">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12"/>
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="#1A2535" Opacity="0.05" Radius="6" Offset="0,2"/>
+                                </Border.Shadow>
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                                      ColumnSpacing="10" Padding="14,10">
+                                    <Frame Grid.Column="0"
+                                           BackgroundColor="#EBF2FF" CornerRadius="10"
+                                           WidthRequest="40" HeightRequest="40"
+                                           HasShadow="False" Padding="0">
+                                        <Label Text="💧" FontSize="16"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Frame>
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         VerticalOptions="Center" Spacing="2">
                                         <Label Text="{Binding AmountMl, StringFormat='{0} ml'}"
-                                               FontSize="16"
-                                               FontAttributes="Bold"/>
+                                               FontSize="15" FontAttributes="Bold"
+                                               TextColor="#1A2535"/>
                                         <Label Text="{Binding LoggedAt, StringFormat='{0:HH:mm} Uhr'}"
-                                               FontSize="12"
-                                               TextColor="Gray"/>
+                                               FontSize="12" TextColor="#9EAAB6"/>
                                     </VerticalStackLayout>
-
-                                    <Button Grid.Column="1"
-                                            Text="✏️"
+                                    <Button Grid.Column="2" Text="✏️"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=EditEntryCommand}"
                                             CommandParameter="{Binding .}"
-                                            BackgroundColor="#3498DB"
-                                            TextColor="White"
-                                            CornerRadius="8"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
-                                            Padding="0"/>
-
-                                    <Button Grid.Column="2"
-                                            Text="🗑️"
+                                            BackgroundColor="#F0F4F8" TextColor="#1A73E8"
+                                            CornerRadius="8" WidthRequest="38" HeightRequest="38"
+                                            Padding="0" FontSize="14"/>
+                                    <Button Grid.Column="3" Text="🗑️"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=DeleteEntryCommand}"
                                             CommandParameter="{Binding .}"
-                                            BackgroundColor="#E74C3C"
-                                            TextColor="White"
-                                            CornerRadius="8"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
-                                            Padding="0"/>
+                                            BackgroundColor="#FEF0F0" TextColor="#E05252"
+                                            CornerRadius="8" WidthRequest="38" HeightRequest="38"
+                                            Padding="0" FontSize="14"/>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </RefreshView>
 
             <ActivityIndicator IsRunning="{Binding IsLoading}"
-                             IsVisible="{Binding IsLoading}"
-                             Color="#3498DB"
-                             Margin="20"/>
+                               IsVisible="{Binding IsLoading}"
+                               Color="#1A73E8" Margin="20"/>
 
         </VerticalStackLayout>
     </ScrollView>

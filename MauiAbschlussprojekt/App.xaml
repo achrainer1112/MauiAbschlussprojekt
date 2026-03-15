@@ -9,6 +9,85 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- ═══════════════════════════════════════════════════════════
+                 GLOBALE INPUT-STYLES
+                 Überschreiben den Windows-Dark-Mode für alle Entry/Editor/Picker
+                 ═══════════════════════════════════════════════════════════ -->
+
+            <Style TargetType="Entry" ApplyToDerivedTypes="True">
+                <Setter Property="TextColor" Value="#2C3E50"/>
+                <Setter Property="PlaceholderColor" Value="#BDBDBD"/>
+                <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="#2C3E50"/>
+                                    <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Focused">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="#2C3E50"/>
+                                    <Setter Property="BackgroundColor" Value="White"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="#BDBDBD"/>
+                                    <Setter Property="BackgroundColor" Value="#EEEEEE"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Editor" ApplyToDerivedTypes="True">
+                <Setter Property="TextColor" Value="#2C3E50"/>
+                <Setter Property="PlaceholderColor" Value="#BDBDBD"/>
+                <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="#2C3E50"/>
+                                    <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Focused">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="#2C3E50"/>
+                                    <Setter Property="BackgroundColor" Value="White"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Picker" ApplyToDerivedTypes="True">
+                <Setter Property="TextColor" Value="#2C3E50"/>
+                <Setter Property="TitleColor" Value="#BDBDBD"/>
+                <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+
+            <Style TargetType="DatePicker" ApplyToDerivedTypes="True">
+                <Setter Property="TextColor" Value="#2C3E50"/>
+                <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+
+            <Style TargetType="TimePicker" ApplyToDerivedTypes="True">
+                <Setter Property="TextColor" Value="#2C3E50"/>
+                <Setter Property="BackgroundColor" Value="#F8F9FA"/>
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
 
         </ResourceDictionary>
     </Application.Resources>

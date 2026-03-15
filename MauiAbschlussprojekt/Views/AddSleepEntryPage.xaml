@@ -2,141 +2,243 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiAbschlussprojekt.Views.AddSleepEntryPage"
-             Title="Nacht hinzufügen">
+             Title="Nacht hinzufügen"
+             BackgroundColor="#F0F4F8">
 
-    <!-- KEIN x:DataType hier – verhindert compiled-binding Konflikte mit Picker/Slider -->
     <ContentPage.Resources>
-        <ResourceDictionary>
-            <Style TargetType="Frame">
-                <Setter Property="BorderColor" Value="LightGray"/>
-                <Setter Property="CornerRadius" Value="10"/>
-                <Setter Property="Padding" Value="15"/>
-                <Setter Property="HasShadow" Value="False"/>
-            </Style>
-        </ResourceDictionary>
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="#9EAAB6"/>
+            <Setter Property="CharacterSpacing" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="White"/>
+            <Setter Property="StrokeThickness" Value="0"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextColor" Value="#6C757D"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Schlafdauer-Zusammenfassung -->
-            <Border StrokeThickness="2" Stroke="#9B59B6" BackgroundColor="#F5EEF8" Padding="15">
+            <!-- Dauer-Zusammenfassung -->
+            <Border BackgroundColor="#EDE9FE" StrokeThickness="2" Stroke="#7C3AED" Padding="16">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10"/>
+                    <RoundRectangle CornerRadius="14"/>
                 </Border.StrokeShape>
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="Geschätzte Schlafdauer" FontSize="13" TextColor="Gray"
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                    <Label Text="GESCHÄTZTE SCHLAFDAUER" Style="{StaticResource SectionTitle}"
                            HorizontalOptions="Center"/>
                     <Label x:Name="SleepDurationLabel"
-                           FontSize="28" FontAttributes="Bold" TextColor="#9B59B6"
-                           HorizontalOptions="Center"/>
+                           FontSize="30" FontAttributes="Bold"
+                           TextColor="#7C3AED" HorizontalOptions="Center"/>
                     <Label x:Name="WarningLabel"
-                           FontSize="12" TextColor="#E74C3C" HorizontalOptions="Center"
-                           IsVisible="False"/>
+                           FontSize="12" TextColor="#E05252"
+                           HorizontalOptions="Center" IsVisible="False"/>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Zeiten -->
-            <Frame>
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Zeiten" FontSize="18" FontAttributes="Bold"/>
+            <!-- Schlafzeiten -->
+            <Label Text="SCHLAFZEITEN" Style="{StaticResource SectionTitle}" Margin="4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="14">
 
                     <!-- Ins Bett -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Ins Bett gegangen" FontAttributes="Bold"/>
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                <Label Text="Datum" FontSize="11" TextColor="Gray"/>
-                                <DatePicker x:Name="BedDatePicker" Format="dd.MM.yyyy"/>
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                <Label Text="Uhrzeit" FontSize="11" TextColor="Gray"/>
-                                <TimePicker x:Name="BedTimePicker" Format="HH:mm"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                        <Label x:Name="BedTimeDisplayLabel" FontSize="12" TextColor="Gray"/>
-                    </VerticalStackLayout>
+                    <Label Text="Ins Bett gegangen" FontSize="14" FontAttributes="Bold" TextColor="#1A2535"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="Datum" Style="{StaticResource FieldLabel}"/>
+                            <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <DatePicker x:Name="BedDatePicker" Format="dd.MM.yyyy"
+                                            TextColor="#1A2535" Margin="8,0"/>
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Uhrzeit" Style="{StaticResource FieldLabel}"/>
+                            <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <TimePicker x:Name="BedTimePicker" Format="HH:mm"
+                                            TextColor="#1A2535" Margin="8,0"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
 
                     <!-- Aufgewacht -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Aufgewacht" FontAttributes="Bold"/>
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                <Label Text="Datum" FontSize="11" TextColor="Gray"/>
-                                <DatePicker x:Name="WakeDatePicker" Format="dd.MM.yyyy"/>
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                <Label Text="Uhrzeit" FontSize="11" TextColor="Gray"/>
-                                <TimePicker x:Name="WakeTimePicker" Format="HH:mm"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                        <Label x:Name="WakeTimeDisplayLabel" FontSize="12" TextColor="Gray"/>
-                    </VerticalStackLayout>
+                    <Label Text="Aufgewacht" FontSize="14" FontAttributes="Bold"
+                           TextColor="#1A2535" Margin="0,8,0,0"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="Datum" Style="{StaticResource FieldLabel}"/>
+                            <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <DatePicker x:Name="WakeDatePicker" Format="dd.MM.yyyy"
+                                            TextColor="#1A2535" Margin="8,0"/>
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Uhrzeit" Style="{StaticResource FieldLabel}"/>
+                            <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <TimePicker x:Name="WakeTimePicker" Format="HH:mm"
+                                            TextColor="#1A2535" Margin="8,0"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Einschlafdauer -->
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Einschlafdauer" FontSize="18" FontAttributes="Bold"/>
-                    <Picker x:Name="FallAsleepPicker" Title="Bitte wählen..."/>
-                </VerticalStackLayout>
-            </Frame>
+            <Label Text="EINSCHLAFDAUER" Style="{StaticResource SectionTitle}" Margin="4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <Picker x:Name="FallAsleepPicker"
+                            Title="Bitte wählen..."
+                            TitleColor="#9EAAB6"
+                            TextColor="#1A2535"
+                            Margin="12,0"/>
+                </Border>
+            </Border>
 
             <!-- Schlafqualität -->
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Schlafqualität" FontSize="18" FontAttributes="Bold"/>
-                    <Label x:Name="QualityLabel" FontSize="16" HorizontalOptions="Center"/>
-                    <Slider x:Name="QualitySlider" Minimum="1" Maximum="5"
-                            MinimumTrackColor="#9B59B6" MaximumTrackColor="LightGray"/>
+            <Label Text="SCHLAFQUALITÄT" Style="{StaticResource SectionTitle}" Margin="4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="12">
+                    <Label x:Name="QualityLabel"
+                           FontSize="16" FontAttributes="Bold"
+                           TextColor="#F39C12" HorizontalOptions="Center"/>
+                    <Slider x:Name="QualitySlider"
+                            Minimum="1" Maximum="5"
+                            MinimumTrackColor="#7C3AED"
+                            MaximumTrackColor="#E8EDF2"
+                            ThumbColor="#7C3AED"/>
                     <Grid ColumnDefinitions="*,*,*,*,*">
-                        <Label Grid.Column="0" Text="1" FontSize="14" HorizontalOptions="Center"/>
-                        <Label Grid.Column="1" Text="2" FontSize="14" HorizontalOptions="Center"/>
-                        <Label Grid.Column="2" Text="3" FontSize="14" HorizontalOptions="Center"/>
-                        <Label Grid.Column="3" Text="4" FontSize="14" HorizontalOptions="Center"/>
-                        <Label Grid.Column="4" Text="5" FontSize="14" HorizontalOptions="Center"/>
+                        <Label Grid.Column="0" Text="1" FontSize="12"
+                               TextColor="#9EAAB6" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Text="2" FontSize="12"
+                               TextColor="#9EAAB6" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Text="3" FontSize="12"
+                               TextColor="#9EAAB6" HorizontalOptions="Center"/>
+                        <Label Grid.Column="3" Text="4" FontSize="12"
+                               TextColor="#9EAAB6" HorizontalOptions="Center"/>
+                        <Label Grid.Column="4" Text="5" FontSize="12"
+                               TextColor="#9EAAB6" HorizontalOptions="Center"/>
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Traumtagebuch -->
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Traumtagebuch (optional)" FontSize="18" FontAttributes="Bold"/>
+            <Label Text="TRAUMTAGEBUCH (OPTIONAL)" Style="{StaticResource SectionTitle}" Margin="4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="12">
                     <Editor x:Name="DreamTextEditor"
                             Placeholder="Was hast du geträumt?"
-                            HeightRequest="80" AutoSize="TextChanges"/>
-                    <VerticalStackLayout x:Name="DreamMoodSection" Spacing="5" IsVisible="False">
-                        <Label Text="Traumstimmung" FontSize="13"/>
-                        <Picker x:Name="DreamMoodPicker" Title="Bitte wählen..."/>
+                            PlaceholderColor="#9EAAB6"
+                            TextColor="#1A2535"
+                            BackgroundColor="Transparent"
+                            HeightRequest="80"
+                            AutoSize="TextChanges"/>
+
+                    <VerticalStackLayout x:Name="DreamMoodSection" Spacing="6" IsVisible="False">
+                        <Label Text="Traumstimmung" Style="{StaticResource FieldLabel}"/>
+                        <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Picker x:Name="DreamMoodPicker"
+                                    Title="Bitte wählen..."
+                                    TitleColor="#9EAAB6"
+                                    TextColor="#1A2535"
+                                    Margin="12,0"/>
+                        </Border>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Notizen -->
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Notizen (optional)" FontSize="18" FontAttributes="Bold"/>
-                    <Editor x:Name="NotesEditor"
-                            Placeholder="Besonderheiten, Gefühle, ..."
-                            HeightRequest="70" AutoSize="TextChanges"/>
-                </VerticalStackLayout>
-            </Frame>
+            <Label Text="NOTIZEN (OPTIONAL)" Style="{StaticResource SectionTitle}" Margin="4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <Editor x:Name="NotesEditor"
+                        Placeholder="Besonderheiten, Gefühle, ..."
+                        PlaceholderColor="#9EAAB6"
+                        TextColor="#1A2535"
+                        BackgroundColor="Transparent"
+                        HeightRequest="70"
+                        AutoSize="TextChanges"/>
+            </Border>
 
             <!-- Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
-                <Button Grid.Column="0" Text="Abbrechen" x:Name="CancelButton"
-                        BackgroundColor="#95A5A6" TextColor="White"
-                        CornerRadius="10" HeightRequest="50"/>
-                <Button Grid.Column="1" Text="Speichern" x:Name="SaveButton"
-                        BackgroundColor="#27AE60" TextColor="White"
-                        CornerRadius="10" HeightRequest="50" FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,4,0,0">
+                <Button Grid.Column="0"
+                        x:Name="CancelButton"
+                        Text="Abbrechen"
+                        BackgroundColor="#F0F4F8" TextColor="#6C757D"
+                        FontAttributes="Bold" CornerRadius="12" HeightRequest="50"/>
+                <Button Grid.Column="1"
+                        x:Name="SaveButton"
+                        Text="Speichern"
+                        BackgroundColor="#7C3AED" TextColor="White"
+                        FontAttributes="Bold" CornerRadius="12" HeightRequest="50"/>
             </Grid>
 
             <ActivityIndicator x:Name="LoadingIndicator"
                                IsRunning="False" IsVisible="False"
-                               Color="#9B59B6" Margin="20"/>
+                               Color="#7C3AED" Margin="20"/>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

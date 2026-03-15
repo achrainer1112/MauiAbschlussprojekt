@@ -11,13 +11,15 @@ namespace MauiAbschlussprojekt.ViewModels
         private readonly ApiService _apiService;
 
         [ObservableProperty]
-        private string username = string.Empty;
-
-        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ProgressDashOffset))]
         private int totalMl;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ProgressDashOffset))]
         private int goalMl = 2000;
+
+        [ObservableProperty]
+        private string username = string.Empty;
 
         [ObservableProperty]
         private double progressPercentage;
@@ -33,6 +35,15 @@ namespace MauiAbschlussprojekt.ViewModels
 
         [ObservableProperty]
         private string customAmountInput = string.Empty;
+
+        // Kreis-Umfang: Innenradius = (180 - 14) / 2 = 83px → 2 * π * 83 ≈ 521
+        // StrokeDashArray im XAML muss ebenfalls 521 sein
+        private const double CircleCircumference = 521.0;
+
+        public double ProgressDashOffset =>
+            GoalMl > 0
+                ? CircleCircumference * (1.0 - Math.Min((double)TotalMl / GoalMl, 1.0))
+                : CircleCircumference;
 
         public ObservableCollection<WaterEntryDto> TodayEntries { get; } = new();
 
@@ -52,16 +63,13 @@ namespace MauiAbschlussprojekt.ViewModels
         private async Task LoadTodayDataAsync()
         {
             IsLoading = true;
-
             try
             {
                 var entries = await _apiService.GetTodayEntriesAsync();
 
                 TodayEntries.Clear();
                 foreach (var entry in entries)
-                {
                     TodayEntries.Add(entry);
-                }
 
                 TotalMl = entries.Sum(e => e.AmountMl);
                 UpdateProgress();
@@ -127,17 +135,14 @@ namespace MauiAbschlussprojekt.ViewModels
         {
             bool confirm = await Shell.Current.DisplayAlert(
                 "Löschen",
-                $"Eintrag ({entry.AmountMl}ml) wirklich löschen?",
-                "Ja",
-                "Nein");
+                $"Eintrag ({entry.AmountMl} ml) wirklich löschen?",
+                "Ja", "Nein");
 
-            if (!confirm)
-                return;
+            if (!confirm) return;
 
             try
             {
                 bool success = await _apiService.DeleteWaterAsync(entry.Id);
-
                 if (success)
                 {
                     TodayEntries.Remove(entry);
@@ -160,8 +165,7 @@ namespace MauiAbschlussprojekt.ViewModels
                 initialValue: entry.AmountMl.ToString(),
                 keyboard: Keyboard.Numeric);
 
-            if (string.IsNullOrWhiteSpace(result))
-                return;
+            if (string.IsNullOrWhiteSpace(result)) return;
 
             if (!int.TryParse(result, out int newAmount) || newAmount <= 0)
             {
@@ -183,15 +187,12 @@ namespace MauiAbschlussprojekt.ViewModels
                 if (updated != null)
                 {
                     int oldAmount = entry.AmountMl;
-                    entry.AmountMl = newAmount;
                     TotalMl = TotalMl - oldAmount + newAmount;
                     UpdateProgress();
 
                     var index = TodayEntries.IndexOf(entry);
                     if (index >= 0)
-                    {
                         TodayEntries[index] = updated;
-                    }
                 }
             }
             catch (Exception ex)
@@ -203,8 +204,7 @@ namespace MauiAbschlussprojekt.ViewModels
         private void UpdateProgress()
         {
             ProgressPercentage = GoalMl > 0 ? Math.Min((double)TotalMl / GoalMl, 1.0) : 0;
-            int percentage = (int)(ProgressPercentage * 100);
-            ProgressText = $"{percentage}%";
+            ProgressText = $"{(int)(ProgressPercentage * 100)}%";
         }
 
         [RelayCommand]

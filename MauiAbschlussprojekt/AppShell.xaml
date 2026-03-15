@@ -5,42 +5,96 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:MauiAbschlussprojekt.Views"
     Shell.FlyoutBehavior="Flyout"
-    FlyoutBackgroundColor="#2C3E50">
+    FlyoutBackgroundColor="#1E2A3A"
+    Shell.BackgroundColor="#1E2A3A"
+    Shell.ForegroundColor="#E8EDF2"
+    Shell.TitleColor="#E8EDF2">
 
-    <!-- Flyout Header MUSS vor den Inhaltselementen stehen (XLS0509) -->
+    <Shell.Resources>
+        <Style TargetType="FlyoutItem">
+            <Setter Property="Shell.ItemTemplate">
+                <DataTemplate>
+                    <Grid HeightRequest="54" Padding="16,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="Grid.BackgroundColor" Value="Transparent"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="Grid.BackgroundColor" Value="#2A3A4A"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </Grid.VisualStateManager.VisualStateGroups>
+                        <Image Grid.Column="0"
+                               Source="{Binding FlyoutIcon}"
+                               WidthRequest="22" HeightRequest="22"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding Title}"
+                               FontSize="15"
+                               TextColor="#E8EDF2"
+                               VerticalOptions="Center"
+                               Margin="14,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </Setter>
+        </Style>
+    </Shell.Resources>
+
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="#34495E"
-              Padding="20"
-              HeightRequest="150">
-            <VerticalStackLayout VerticalOptions="Center" Spacing="10">
-                <Label Text="💧😴 HealthTracker"
-                       FontSize="24"
+        <Grid BackgroundColor="#162032"
+              Padding="20,40,20,20"
+              HeightRequest="160">
+            <VerticalStackLayout VerticalOptions="End" Spacing="6">
+                <Frame x:Name="AvatarFrame"
+                       BackgroundColor="#1A73E8"
+                       CornerRadius="28"
+                       WidthRequest="56"
+                       HeightRequest="56"
+                       HasShadow="False"
+                       Padding="0"
+                       HorizontalOptions="Start">
+                    <Label x:Name="AvatarLabel"
+                           Text="?"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Frame>
+                <Label x:Name="FlyoutUsernameLabel"
+                       Text="HealthTracker"
+                       FontSize="17"
                        FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
+                       TextColor="#E8EDF2"/>
                 <Label Text="Dein Gesundheits-Assistent"
-                       FontSize="14"
-                       TextColor="White"
-                       Opacity="0.8"
-                       HorizontalOptions="Center"/>
+                       FontSize="12"
+                       TextColor="#7A8FA6"/>
             </VerticalStackLayout>
         </Grid>
     </Shell.FlyoutHeader>
 
-    <!-- Flyout Footer MUSS ebenfalls vor den Inhaltselementen stehen -->
     <Shell.FlyoutFooter>
-        <Grid BackgroundColor="#1A252F"
-              Padding="20,10"
-              HeightRequest="60">
+        <Grid BackgroundColor="#111C2A"
+              Padding="20,12"
+              HeightRequest="50">
             <Label Text="Version 1.0"
                    FontSize="12"
-                   TextColor="White"
-                   Opacity="0.6"
+                   TextColor="#4A6070"
                    VerticalOptions="Center"/>
         </Grid>
     </Shell.FlyoutFooter>
 
-    <!-- Login / Register - im Flyout versteckt, aber als absolute Route erreichbar -->
     <ShellContent Route="LoginPage"
                   ContentTemplate="{DataTemplate views:LoginPage}"
                   Shell.FlyoutItemIsVisible="False"/>
@@ -49,23 +103,19 @@
                   ContentTemplate="{DataTemplate views:RegisterPage}"
                   Shell.FlyoutItemIsVisible="False"/>
 
-    <!-- Flyout Items (Hauptmenü) -->
-    <FlyoutItem Title="Wasser-Tracker"
-                Icon="drop.png">
+    <FlyoutItem Title="Wasser-Tracker" Icon="drop.png">
         <ShellContent Route="WaterTracker"
-                      ContentTemplate="{DataTemplate views:MainPage}" />
+                      ContentTemplate="{DataTemplate views:MainPage}"/>
     </FlyoutItem>
 
-    <FlyoutItem Title="Schlaf-Tracker"
-                Icon="moon.png">
+    <FlyoutItem Title="Schlaf-Tracker" Icon="moon.png">
         <ShellContent Route="SleepTracker"
-                      ContentTemplate="{DataTemplate views:SleepTrackerPage}" />
+                      ContentTemplate="{DataTemplate views:SleepTrackerPage}"/>
     </FlyoutItem>
 
-    <FlyoutItem Title="Einstellungen"
-                Icon="settings.png">
+    <FlyoutItem Title="Einstellungen" Icon="settings.png">
         <ShellContent Route="Settings"
-                      ContentTemplate="{DataTemplate views:SettingsPage}" />
+                      ContentTemplate="{DataTemplate views:SettingsPage}"/>
     </FlyoutItem>
 
 </Shell>

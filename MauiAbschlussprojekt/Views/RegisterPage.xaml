@@ -5,127 +5,226 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MauiAbschlussprojekt.Views.RegisterPage"
              x:DataType="vm:RegisterViewModel"
-             Title="Registrierung">
+             Title=""
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#0F1923">
 
+	<ContentPage.Resources>
+		<ResourceDictionary>
+			<toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+			<toolkit:IsStringNotNullOrEmptyConverter x:Key="IsNotNullOrEmptyConverter" />
 
-    <!-- In RegisterPage.xaml -->
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-    
-    <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="20">
+			<Style x:Key="InputStyle" TargetType="Entry">
+				<Setter Property="BackgroundColor" Value="Transparent"/>
+				<Setter Property="TextColor" Value="#E8EDF2"/>
+				<Setter Property="PlaceholderColor" Value="#4A6070"/>
+				<Setter Property="FontSize" Value="15"/>
+				<Setter Property="HeightRequest" Value="52"/>
+			</Style>
+			<Style x:Key="SectionLabel" TargetType="Label">
+				<Setter Property="FontSize" Value="11"/>
+				<Setter Property="TextColor" Value="#7A8FA6"/>
+				<Setter Property="FontAttributes" Value="Bold"/>
+				<Setter Property="CharacterSpacing" Value="1"/>
+				<Setter Property="Margin" Value="0,0,0,10"/>
+			</Style>
+			<Style x:Key="FieldLabel" TargetType="Label">
+				<Setter Property="FontSize" Value="13"/>
+				<Setter Property="TextColor" Value="#7A8FA6"/>
+				<Setter Property="Margin" Value="0,0,0,4"/>
+			</Style>
+			<Style x:Key="InputBorder" TargetType="Border">
+				<Setter Property="StrokeThickness" Value="1"/>
+				<Setter Property="Stroke" Value="#2A3D52"/>
+				<Setter Property="BackgroundColor" Value="#111C2A"/>
+			</Style>
+		</ResourceDictionary>
+	</ContentPage.Resources>
 
-            <!-- Header -->
-            <Label Text="TrinkTracker"
-                   FontSize="32"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   Margin="0,20,0,10"/>
+	<ScrollView>
+		<VerticalStackLayout Padding="24,48,24,32" Spacing="16">
 
-            <Label Text="Erstelle deinen Account"
-                   FontSize="16"
-                   TextColor="Gray"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20"/>
+			<!-- Zurück + Titel -->
+			<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+				<Label Grid.Column="0"
+                       Text="←"
+                       FontSize="22"
+                       TextColor="#1A73E8"
+                       VerticalOptions="Center">
+					<Label.GestureRecognizers>
+						<TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
+					</Label.GestureRecognizers>
+				</Label>
+				<VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" Spacing="2">
+					<Label Text="Konto erstellen"
+                           FontSize="22" FontAttributes="Bold" TextColor="#E8EDF2"/>
+					<Label Text="Fülle alle Pflichtfelder aus"
+                           FontSize="13" TextColor="#7A8FA6"/>
+				</VerticalStackLayout>
+			</Grid>
 
-            <!-- Basis-Daten -->
-            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
-                <VerticalStackLayout Spacing="15" Padding="15">
-                    <Label Text="Account-Daten" FontAttributes="Bold" FontSize="18"/>
+			<!-- Account-Daten -->
+			<Border BackgroundColor="#1A2535" StrokeThickness="1" Stroke="#2A3D52" Padding="18">
+				<Border.StrokeShape>
+					<RoundRectangle CornerRadius="14"/>
+				</Border.StrokeShape>
+				<VerticalStackLayout Spacing="12">
+					<Label Text="ACCOUNT-DATEN" Style="{StaticResource SectionLabel}"/>
 
-                    <Entry Placeholder="Username"
-                           Text="{Binding Username}"/>
+					<Border Style="{StaticResource InputBorder}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="Benutzername"
+                               Text="{Binding Username}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
 
-                    <Entry Placeholder="Email"
-                           Keyboard="Email"
-                           Text="{Binding Email}"/>
+					<Border Style="{StaticResource InputBorder}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="E-Mail"
+                               Keyboard="Email"
+                               Text="{Binding Email}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
 
-                    <Entry Placeholder="Passwort"
-                           IsPassword="True"
-                           Text="{Binding Password}"/>
+					<Border Style="{StaticResource InputBorder}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="Passwort"
+                               IsPassword="True"
+                               Text="{Binding Password}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
 
-                    <Entry Placeholder="Passwort bestätigen"
-                           IsPassword="True"
-                           Text="{Binding ConfirmPassword}"/>
-                </VerticalStackLayout>
-            </Frame>
+					<Border Style="{StaticResource InputBorder}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="Passwort bestätigen"
+                               IsPassword="True"
+                               Text="{Binding ConfirmPassword}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
+				</VerticalStackLayout>
+			</Border>
 
-            <!-- Körperdaten (Optional) -->
-            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
-                <VerticalStackLayout Spacing="15" Padding="15">
-                    <Label Text="Körperdaten (optional)" FontAttributes="Bold" FontSize="18"/>
-                    <Label Text="Basierend auf deinem Gewicht und Aktivitätslevel berechnen wir dein Trinkziel."
-                           FontSize="12"
-                           TextColor="Gray"/>
+			<!-- Körperdaten -->
+			<Border BackgroundColor="#1A2535" StrokeThickness="1" Stroke="#2A3D52" Padding="18">
+				<Border.StrokeShape>
+					<RoundRectangle CornerRadius="14"/>
+				</Border.StrokeShape>
+				<VerticalStackLayout Spacing="12">
+					<Label Text="KÖRPERDATEN (OPTIONAL)" Style="{StaticResource SectionLabel}"/>
+					<Label Text="Wir berechnen dein tägliches Trinkziel anhand dieser Daten."
+                           FontSize="12" TextColor="#4A6070"/>
 
-                    <Entry Placeholder="Körpergewicht in kg (z.B. 75)"
-                           Keyboard="Numeric"
-                           Text="{Binding WeightInput}"/>
+					<Border Style="{StaticResource InputBorder}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="Körpergewicht in kg (z.B. 75)"
+                               Keyboard="Numeric"
+                               Text="{Binding WeightInput}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
 
-                    <Label Text="Aktivitätslevel"/>
-                    <Picker ItemsSource="{Binding ActivityLevels}"
-                            ItemDisplayBinding="{Binding Display}"
-                            SelectedItem="{Binding SelectedActivityLevel}"/>
+					<Label Text="Aktivitätslevel" Style="{StaticResource FieldLabel}"/>
 
-                    <Label Text="{Binding CalculatedGoalText}"
-                           FontSize="14"
+					<!-- Picker mit explizit dunklem Hintergrund -->
+					<Border StrokeThickness="1" Stroke="#2A3D52" BackgroundColor="#111C2A">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Picker Title="Bitte wählen..."
+                                TitleColor="#4A6070"
+                                TextColor="#E8EDF2"
+                                BackgroundColor="#111C2A"
+                                ItemsSource="{Binding ActivityLevels}"
+                                ItemDisplayBinding="{Binding Display}"
+                                SelectedItem="{Binding SelectedActivityLevel}"
+                                Margin="14,0"/>
+					</Border>
+
+					<Label Text="{Binding CalculatedGoalText}"
+                           FontSize="13"
                            FontAttributes="Bold"
-                           TextColor="#2196F3"
+                           TextColor="#1A73E8"
                            IsVisible="{Binding ShowCalculatedGoal}"/>
-                </VerticalStackLayout>
-            </Frame>
+				</VerticalStackLayout>
+			</Border>
 
-            <!-- Custom Goal -->
-            <Frame BorderColor="LightGray" CornerRadius="10" Padding="0" HasShadow="False">
-                <VerticalStackLayout Spacing="15" Padding="15">
-                    <HorizontalStackLayout Spacing="10">
-                        <CheckBox IsChecked="{Binding ShowCustomGoal}"/>
-                        <Label Text="Eigenes Tagesziel festlegen"
+			<!-- Eigenes Tagesziel -->
+			<Border BackgroundColor="#1A2535" StrokeThickness="1" Stroke="#2A3D52" Padding="18">
+				<Border.StrokeShape>
+					<RoundRectangle CornerRadius="14"/>
+				</Border.StrokeShape>
+				<VerticalStackLayout Spacing="12">
+					<HorizontalStackLayout Spacing="10">
+						<CheckBox IsChecked="{Binding ShowCustomGoal}"
+                                  Color="#1A73E8"/>
+						<Label Text="Eigenes Tagesziel festlegen"
+                               TextColor="#E8EDF2"
+                               FontSize="14"
                                VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
+					</HorizontalStackLayout>
 
-                    <Entry Placeholder="Eigenes Ziel in ml (z.B. 2500)"
-                           Keyboard="Numeric"
-                           Text="{Binding CustomGoalInput}"
-                           IsVisible="{Binding ShowCustomGoal}"/>
-                </VerticalStackLayout>
-            </Frame>
+					<Border Style="{StaticResource InputBorder}"
+                            IsVisible="{Binding ShowCustomGoal}">
+						<Border.StrokeShape>
+							<RoundRectangle CornerRadius="10"/>
+						</Border.StrokeShape>
+						<Entry Placeholder="Eigenes Ziel in ml (z.B. 2500)"
+                               Keyboard="Numeric"
+                               Text="{Binding CustomGoalInput}"
+                               Style="{StaticResource InputStyle}"
+                               Margin="14,0"/>
+					</Border>
+				</VerticalStackLayout>
+			</Border>
 
-            <!-- Error Message -->
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   IsVisible="{Binding ErrorMessage.Length}"
-                   HorizontalOptions="Center"/>
+			<!-- Fehler -->
+			<Label Text="{Binding ErrorMessage}"
+                   TextColor="#E05252"
+                   FontSize="13"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
 
-            <!-- Register Button -->
-            <Button Text="Registrieren"
+			<!-- Registrieren Button -->
+			<Button Text="Konto erstellen"
                     Command="{Binding RegisterCommand}"
-                    BackgroundColor="#2196F3"
+                    BackgroundColor="#1A73E8"
                     TextColor="White"
-                    HeightRequest="50"
-                    CornerRadius="10"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="52"
                     IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
 
-            <ActivityIndicator IsRunning="{Binding IsLoading}"
+			<ActivityIndicator IsRunning="{Binding IsLoading}"
                              IsVisible="{Binding IsLoading}"
-                             Color="#2196F3"/>
+                             Color="#1A73E8"/>
 
-            <!-- Login Link -->
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
-                <Label Text="Bereits registriert?"
-                       TextColor="Gray"/>
-                <Label Text="Zum Login"
-                       TextColor="#2196F3"
-                       TextDecorations="Underline">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
-                    </Label.GestureRecognizers>
-                </Label>
-            </HorizontalStackLayout>
+			<!-- Zum Login -->
+			<HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+				<Label Text="Bereits registriert?"
+                       FontSize="14" TextColor="#7A8FA6" VerticalOptions="Center"/>
+				<Label Text="Zum Login"
+                       FontSize="14" TextColor="#1A73E8" FontAttributes="Bold"
+                       VerticalOptions="Center">
+					<Label.GestureRecognizers>
+						<TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
+					</Label.GestureRecognizers>
+				</Label>
+			</HorizontalStackLayout>
 
-        </VerticalStackLayout>
-    </ScrollView>
+		</VerticalStackLayout>
+	</ScrollView>
 </ContentPage>

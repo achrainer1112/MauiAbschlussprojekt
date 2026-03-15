@@ -5,182 +5,217 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MauiAbschlussprojekt.Views.SettingsPage"
              x:DataType="viewmodels:SettingsViewModel"
-             Title="⚙️ Einstellungen">
+             Title="Einstellungen"
+             BackgroundColor="#F0F4F8">
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <Style x:Key="SectionTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="TextColor" Value="#9EAAB6"/>
+                <Setter Property="CharacterSpacing" Value="1"/>
+                <Setter Property="Margin" Value="0,0,0,12"/>
+            </Style>
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="TextColor" Value="#6C757D"/>
+                <Setter Property="Margin" Value="0,0,0,4"/>
+            </Style>
+            <Style x:Key="Card" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White"/>
+                <Setter Property="StrokeThickness" Value="0"/>
+                <Setter Property="Padding" Value="18"/>
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Water Tracker Settings -->
-            <Frame BorderColor="#3498DB" CornerRadius="12" Padding="15" HasShadow="True">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Wasser-Tracker"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           TextColor="#3498DB"/>
+            <!-- Profil-Sektion -->
+            <Label Text="PROFIL" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Gewicht (kg)"/>
-                        <Entry Text="{Binding WeightInput}"
-                               Placeholder="z.B. 75"
-                               Keyboard="Numeric"/>
-                    </VerticalStackLayout>
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="14">
+                    <Label Style="{StaticResource FieldLabel}" Text="Benutzername"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding Username}" FontSize="15" TextColor="#1A2535"
+                               BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
+                    </Border>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Aktivitätslevel"/>
-                        <Picker ItemsSource="{Binding ActivityLevels}"
+                    <Label Style="{StaticResource FieldLabel}" Text="Körpergewicht (kg)"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding WeightKg}" Keyboard="Numeric" FontSize="15"
+                               TextColor="#1A2535" BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
+                    </Border>
+
+                    <Label Style="{StaticResource FieldLabel}" Text="Aktivitätslevel"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding ActivityLevelOptions}"
                                 ItemDisplayBinding="{Binding Display}"
-                                SelectedItem="{Binding SelectedActivityLevel}"/>
-                    </VerticalStackLayout>
+                                SelectedItem="{Binding SelectedActivityLevel}"
+                                TextColor="#1A2535" TitleColor="#9EAAB6"
+                                Title="Bitte wählen..." Margin="12,0"/>
+                    </Border>
 
-                    <Label Text="{Binding CalculatedGoalText}"
-                           IsVisible="{Binding ShowCalculatedGoal}"
-                           FontSize="12"
-                           TextColor="#27AE60"
-                           FontAttributes="Italic"/>
+                    <Button Text="Profil speichern"
+                            Command="{Binding SaveProfileCommand}"
+                            BackgroundColor="#1A73E8" TextColor="White"
+                            FontAttributes="Bold" CornerRadius="12" HeightRequest="48"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                </VerticalStackLayout>
+            </Border>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Eigenes Tagesziel (ml)"/>
-                        <Entry Text="{Binding CustomGoalInput}"
-                               Placeholder="Optional: Eigenes Ziel"
-                               Keyboard="Numeric"/>
+            <!-- Wasser-Einstellungen -->
+            <Label Text="WASSER-TRACKER" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
+
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="14">
+                    <Label Style="{StaticResource FieldLabel}" Text="Tagesziel (ml)"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding DailyGoalMl}" Keyboard="Numeric" FontSize="15"
+                               TextColor="#1A2535" BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
+                    </Border>
+
+                    <!-- Erinnerungen Toggle -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="Trink-Erinnerungen" FontSize="14" TextColor="#1A2535" FontAttributes="Bold"/>
+                            <Label Text="Regelmäßige Push-Benachrichtigungen" FontSize="12" TextColor="#9EAAB6"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding ReminderEnabled}"
+                                OnColor="#1A73E8" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="10"
+                                        IsVisible="{Binding ReminderEnabled}">
+                        <Label Style="{StaticResource FieldLabel}" Text="Intervall (Minuten)"/>
+                        <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding ReminderIntervalMinutes}" Keyboard="Numeric"
+                                   FontSize="15" TextColor="#1A2535" BackgroundColor="Transparent"
+                                   Margin="12,0" HeightRequest="48"/>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Style="{StaticResource FieldLabel}" Text="Von (Stunde)"/>
+                                <Stepper Value="{Binding ReminderStartHour}" Minimum="0" Maximum="23" Increment="1"/>
+                                <Label Text="{Binding ReminderStartHour, StringFormat='{0}:00 Uhr'}"
+                                       FontSize="12" TextColor="#1A73E8" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Style="{StaticResource FieldLabel}" Text="Bis (Stunde)"/>
+                                <Stepper Value="{Binding ReminderEndHour}" Minimum="0" Maximum="23" Increment="1"/>
+                                <Label Text="{Binding ReminderEndHour, StringFormat='{0}:00 Uhr'}"
+                                       FontSize="12" TextColor="#1A73E8" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
                     </VerticalStackLayout>
 
                     <Button Text="Wasser-Einstellungen speichern"
-                            Command="{Binding SaveUserSettingsCommand}"
-                            BackgroundColor="#3498DB"
-                            TextColor="White"
-                            CornerRadius="10"
+                            Command="{Binding SaveReminderSettingsCommand}"
+                            BackgroundColor="#EBF2FF" TextColor="#1A73E8"
+                            FontAttributes="Bold" CornerRadius="12" HeightRequest="48"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Water Reminders -->
-            <Frame BorderColor="#2ECC71" CornerRadius="12" Padding="15" HasShadow="True">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Wasser-Erinnerungen"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           TextColor="#27AE60"/>
+            <!-- Schlaf-Einstellungen -->
+            <Label Text="SCHLAF-TRACKER" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
 
-                    <HorizontalStackLayout Spacing="10">
-                        <Label Text="Erinnerungen aktivieren"
-                               VerticalOptions="Center"
-                               HorizontalOptions="StartAndExpand"/>
-                        <Switch IsToggled="{Binding ReminderEnabled}"/>
-                    </HorizontalStackLayout>
+            <Border Style="{StaticResource Card}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.07" Radius="10" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="14">
+                    <Label Style="{StaticResource FieldLabel}" Text="Ziel-Schlafdauer (Stunden)"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding TargetSleepHoursInput}" Keyboard="Numeric" Placeholder="z.B. 8"
+                               FontSize="15" TextColor="#1A2535" PlaceholderColor="#9EAAB6"
+                               BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
+                    </Border>
 
-                    <VerticalStackLayout Spacing="15" IsVisible="{Binding ReminderEnabled}">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="Intervall (Minuten)"/>
-                            <Entry Text="{Binding ReminderIntervalInput}"
-                                   Placeholder="z.B. 60"
-                                   Keyboard="Numeric"/>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="Start-Uhrzeit"/>
-                            <Stepper Value="{Binding ReminderStartHour}"
-                                     Minimum="0"
-                                     Maximum="23"
-                                     Increment="1"/>
-                            <Label Text="{Binding ReminderStartHour, StringFormat='{0}:00 Uhr'}"
-                                   FontSize="12"
-                                   TextColor="Gray"/>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="End-Uhrzeit"/>
-                            <Stepper Value="{Binding ReminderEndHour}"
-                                     Minimum="0"
-                                     Maximum="23"
-                                     Increment="1"/>
-                            <Label Text="{Binding ReminderEndHour, StringFormat='{0}:00 Uhr'}"
-                                   FontSize="12"
-                                   TextColor="Gray"/>
-                        </VerticalStackLayout>
-
-                        <Button Text="Erinnerungen speichern"
-                                Command="{Binding SaveReminderSettingsCommand}"
-                                BackgroundColor="#27AE60"
-                                TextColor="White"
-                                CornerRadius="10"
-                                IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- Sleep Tracker Settings -->
-            <Frame BorderColor="#9B59B6" CornerRadius="12" Padding="15" HasShadow="True">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Schlaf-Tracker"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           TextColor="#9B59B6"/>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Ziel-Schlafdauer (Stunden)"/>
-                        <Entry Text="{Binding TargetSleepHoursInput}"
-                               Placeholder="z.B. 8"
-                               Keyboard="Numeric"/>
-                    </VerticalStackLayout>
-
-                    <!-- Ziel-Schlafenszeit -->
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Ziel-Schlafenszeit"/>
+                    <Label Style="{StaticResource FieldLabel}" Text="Ziel-Schlafenszeit"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
                         <TimePicker Time="{Binding TargetBedTime, Mode=TwoWay}"
-                                    Format="HH:mm"/>
-                    </VerticalStackLayout>
+                                    Format="HH:mm" TextColor="#1A2535" Margin="12,0"/>
+                    </Border>
 
-                    <!-- Ziel-Aufwachzeit -->
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Ziel-Aufwachzeit"/>
+                    <Label Style="{StaticResource FieldLabel}" Text="Ziel-Aufwachzeit"/>
+                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
                         <TimePicker Time="{Binding TargetWakeTime, Mode=TwoWay}"
-                                    Format="HH:mm"/>
-                    </VerticalStackLayout>
+                                    Format="HH:mm" TextColor="#1A2535" Margin="12,0"/>
+                    </Border>
 
-                    <!-- Schlaf-Erinnerung -->
-                    <VerticalStackLayout Spacing="4">
-                        <HorizontalStackLayout Spacing="10">
-                            <Label Text="Schlaf-Erinnerung (1h vorher)"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="StartAndExpand"/>
-                            <Switch IsToggled="{Binding SleepReminderEnabled}"/>
-                        </HorizontalStackLayout>
-                        <Label Text="Sendet eine Benachrichtigung 1 Stunde vor der Ziel-Schlafenszeit."
-                               FontSize="11"
-                               TextColor="Gray"
-                               IsVisible="{Binding SleepReminderEnabled}"/>
-                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="Schlaf-Erinnerung" FontSize="14" TextColor="#1A2535" FontAttributes="Bold"/>
+                            <Label Text="1 Stunde vor Schlafenszeit" FontSize="12" TextColor="#9EAAB6"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding SleepReminderEnabled}"
+                                OnColor="#7C3AED" VerticalOptions="Center"/>
+                    </Grid>
 
                     <Button Text="Schlaf-Einstellungen speichern"
                             Command="{Binding SaveSleepSettingsCommand}"
-                            BackgroundColor="#9B59B6"
-                            TextColor="White"
-                            CornerRadius="10"
+                            BackgroundColor="#EDE9FE" TextColor="#7C3AED"
+                            FontAttributes="Bold" CornerRadius="12" HeightRequest="48"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Logout Button -->
+            <!-- Logout -->
             <Button Text="Abmelden"
                     Command="{Binding LogoutCommand}"
-                    BackgroundColor="#E74C3C"
-                    TextColor="White"
-                    CornerRadius="10"
-                    HeightRequest="50"
-                    FontAttributes="Bold"
-                    Margin="0,20,0,0"/>
+                    BackgroundColor="#FEF0F0" TextColor="#E05252"
+                    FontAttributes="Bold" FontSize="15"
+                    CornerRadius="12" HeightRequest="50"
+                    Margin="0,4,0,0"/>
 
             <ActivityIndicator IsRunning="{Binding IsLoading}"
                              IsVisible="{Binding IsLoading}"
-                             Color="#3498DB"
-                             Margin="20"/>
+                             Color="#1A73E8" Margin="20"/>
 
         </VerticalStackLayout>
     </ScrollView>
