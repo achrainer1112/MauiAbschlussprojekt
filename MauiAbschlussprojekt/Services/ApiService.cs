@@ -336,5 +336,72 @@ namespace MauiAbschlussprojekt.Services
                 return null;
             }
         }
+
+        public async Task<AuthResponse> GoogleLoginAsync(string idToken)
+        {
+            try
+            {
+                var body = new { idToken };
+                var json = JsonConvert.SerializeObject(body);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(
+                    $"{BaseUrl}/auth/google-login", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                var result = JsonConvert.DeserializeObject<AuthResponse>(responseContent);
+
+                if (result?.Success == true)
+                {
+                    Token = result.Token;
+                    CurrentUserId = result.User?.Id;
+                    CurrentUser = result.User;
+                }
+
+                return result ?? new AuthResponse
+                {
+                    Success = false,
+                    Message = "Ungültige Serverantwort"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponse
+                {
+                    Success = false,
+                    Message = $"Verbindungsfehler: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponse> GoogleExchangeAsync(
+    string code, string redirectUri, string codeVerifier)
+        {
+            try
+            {
+                var body = new { code, redirectUri, codeVerifier };
+                var json = JsonConvert.SerializeObject(body);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(
+                    $"{BaseUrl}/auth/google-exchange", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                var result = JsonConvert.DeserializeObject<AuthResponse>(responseContent);
+
+                if (result?.Success == true)
+                {
+                    Token = result.Token;
+                    CurrentUserId = result.User?.Id;
+                    CurrentUser = result.User;
+                }
+
+                return result ?? new AuthResponse { Success = false };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponse { Success = false, Message = ex.Message };
+            }
+        }
     }
 }

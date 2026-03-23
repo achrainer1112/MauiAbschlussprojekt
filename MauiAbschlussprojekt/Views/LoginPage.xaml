@@ -1,122 +1,120 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiAbschlussprojekt.ViewModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MauiAbschlussprojekt.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
              Title=""
              Shell.NavBarIsVisible="False"
              BackgroundColor="#0F1923">
 
-	<ContentPage.Resources>
-		<ResourceDictionary>
-			<toolkit:IsStringNotNullOrEmptyConverter x:Key="IsNotNullOrEmptyConverter" />
-			<Style x:Key="InputStyle" TargetType="Entry">
-				<Setter Property="BackgroundColor" Value="Transparent"/>
-				<Setter Property="TextColor" Value="#E8EDF2"/>
-				<Setter Property="PlaceholderColor" Value="#4A6070"/>
-				<Setter Property="FontSize" Value="15"/>
-				<Setter Property="HeightRequest" Value="52"/>
-			</Style>
-		</ResourceDictionary>
-	</ContentPage.Resources>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsNotNullOrEmptyConverter" />
+            <Style x:Key="InputStyle" TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="TextColor" Value="#E8EDF2"/>
+                <Setter Property="PlaceholderColor" Value="#4A6070"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="HeightRequest" Value="52"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
-	<ScrollView>
-		<VerticalStackLayout Padding="32,60,32,32"
-							 Spacing="0"
-							 VerticalOptions="FillAndExpand">
+    <ScrollView>
+        <VerticalStackLayout Padding="32,60,32,32"
+                             Spacing="0"
+                             VerticalOptions="FillAndExpand">
 
-			<VerticalStackLayout Spacing="12" Margin="0,0,0,48" HorizontalOptions="Center">
-				<Frame BackgroundColor="#1A73E8"
-                       CornerRadius="28"
-                       WidthRequest="80"
-                       HeightRequest="80"
-                       HasShadow="False"
-                       Padding="0"
-                       HorizontalOptions="Center">
-					<Label Text="💧"
-                           FontSize="36"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
-				</Frame>
-				<Label Text="HealthTracker"
-                       FontSize="26"
-                       FontAttributes="Bold"
-                       TextColor="#E8EDF2"
-                       HorizontalOptions="Center"/>
-				<Label Text="Willkommen zurück"
-                       FontSize="14"
-                       TextColor="#7A8FA6"
-                       HorizontalOptions="Center"/>
-			</VerticalStackLayout>
+            <!-- Logo + Titel -->
+            <VerticalStackLayout Spacing="12" Margin="0,0,0,48"
+                                 HorizontalOptions="Center">
+                <Frame BackgroundColor="#1A73E8"
+                       CornerRadius="28" WidthRequest="80" HeightRequest="80"
+                       HasShadow="False" Padding="0" HorizontalOptions="Center">
+                    <Label Text="💧" FontSize="36"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Frame>
+                <Label Text="HealthTracker" FontSize="26" FontAttributes="Bold"
+                       TextColor="#E8EDF2" HorizontalOptions="Center"/>
+                <Label Text="Willkommen zurück" FontSize="14"
+                       TextColor="#7A8FA6" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
 
-			<VerticalStackLayout Spacing="12">
-
-				<Border StrokeThickness="1"
-                        Stroke="#2A3D52"
-                        BackgroundColor="#1E2D3D">
-					<Border.StrokeShape>
-						<RoundRectangle CornerRadius="12"/>
-					</Border.StrokeShape>
-					<Entry Placeholder="E-Mail"
-                           Text="{Binding Email}"
-                           Keyboard="Email"
-                           Style="{StaticResource InputStyle}"
+            <!-- Eingabefelder -->
+            <VerticalStackLayout Spacing="12">
+                <Border StrokeThickness="1" Stroke="#2A3D52" BackgroundColor="#1E2D3D">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <Entry Placeholder="E-Mail" Text="{Binding Email}"
+                           Keyboard="Email" Style="{StaticResource InputStyle}"
                            Margin="16,0"/>
-				</Border>
+                </Border>
 
-				<Border StrokeThickness="1"
-                        Stroke="#2A3D52"
-                        BackgroundColor="#1E2D3D">
-					<Border.StrokeShape>
-						<RoundRectangle CornerRadius="12"/>
-					</Border.StrokeShape>
-					<Entry Placeholder="Passwort"
-                           IsPassword="True"
-                           Text="{Binding Password}"
-                           Style="{StaticResource InputStyle}"
+                <Border StrokeThickness="1" Stroke="#2A3D52" BackgroundColor="#1E2D3D">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <Entry Placeholder="Passwort" IsPassword="True"
+                           Text="{Binding Password}" Style="{StaticResource InputStyle}"
                            Margin="16,0"/>
-				</Border>
+                </Border>
 
-				<Label Text="{Binding ErrorMessage}"
-                       TextColor="#E05252"
-                       FontSize="13"
-                       IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullOrEmptyConverter}}"
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#E05252" FontSize="13"
+                       IsVisible="{Binding ErrorMessage,
+                           Converter={StaticResource IsNotNullOrEmptyConverter}}"
                        Margin="4,0"/>
+            </VerticalStackLayout>
 
-			</VerticalStackLayout>
-
-			<Button Text="Anmelden"
+            <!-- Anmelden Button -->
+            <Button Text="Anmelden"
                     Command="{Binding LoginCommand}"
-                    BackgroundColor="#1A73E8"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    FontSize="16"
-                    CornerRadius="12"
-                    HeightRequest="52"
+                    BackgroundColor="#1A73E8" TextColor="White"
+                    FontAttributes="Bold" FontSize="16"
+                    CornerRadius="12" HeightRequest="52"
                     Margin="0,24,0,0"/>
 
-			<ActivityIndicator IsRunning="{Binding IsLoading}"
-							 IsVisible="{Binding IsLoading}"
-							 Color="#1A73E8"
-							 Margin="0,12,0,0"/>
+            <!-- Trennlinie -->
+            <Label Text="— oder —"
+                   FontSize="12" TextColor="#4A6070"
+                   HorizontalOptions="Center" Margin="0,20,0,20"/>
 
-			<HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,28,0,0">
-				<Label Text="Noch kein Konto?"
-                       FontSize="14"
-                       TextColor="#7A8FA6"
-                       VerticalOptions="Center"/>
-				<Label Text="Registrieren"
-                       FontSize="14"
-                       TextColor="#1A73E8"
-                       FontAttributes="Bold"
+            <!-- Google Button -->
+            <Border StrokeThickness="1" Stroke="#3A5070" BackgroundColor="#1E2D3D">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <Button Text="🔵  Mit Google anmelden"
+                        Command="{Binding LoginWithGoogleCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#E8EDF2"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        HeightRequest="52"
+                        BorderWidth="0"/>
+            </Border>
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="#1A73E8" Margin="0,12,0,0"/>
+
+            <HorizontalStackLayout HorizontalOptions="Center"
+                                   Spacing="6" Margin="0,28,0,0">
+                <Label Text="Noch kein Konto?" FontSize="14"
+                       TextColor="#7A8FA6" VerticalOptions="Center"/>
+                <Label Text="Registrieren" FontSize="14"
+                       TextColor="#1A73E8" FontAttributes="Bold"
                        VerticalOptions="Center">
-					<Label.GestureRecognizers>
-						<TapGestureRecognizer Command="{Binding NavigateToRegisterCommand}"/>
-					</Label.GestureRecognizers>
-				</Label>
-			</HorizontalStackLayout>
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding NavigateToRegisterCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
 
-		</VerticalStackLayout>
-	</ScrollView>
-
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
