@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -119,7 +119,7 @@ namespace WebAPI.Controllers
                     return Ok(new AuthResponse
                     {
                         Success = false,
-                        Message = "Ungültige Anmeldedaten"
+                        Message = "Ung�ltige Anmeldedaten"
                     });
                 }
 

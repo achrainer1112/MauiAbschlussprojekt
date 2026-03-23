@@ -8,15 +8,21 @@
              Title="Schlaf-Statistiken"
              BackgroundColor="#F0F4F8">
 
-    <ScrollView>
+    <ScrollView x:Name="MainScrollView">
         <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Übersichtskacheln -->
+            <!-- Lade-Indikator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="#7C3AED" Margin="20"/>
+
+            <!-- ══ ÜBERSICHT: 4 Kacheln ══ -->
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
                   ColumnSpacing="12" RowSpacing="12">
 
                 <!-- Ø Schlaf -->
-                <Border Grid.Column="0" Grid.Row="0" BackgroundColor="White" StrokeThickness="0" Padding="16">
+                <Border Grid.Column="0" Grid.Row="0"
+                        BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
                     </Border.StrokeShape>
@@ -28,14 +34,14 @@
                                TextColor="#9EAAB6" CharacterSpacing="1"/>
                         <Label Text="{Binding AverageSleepHours, StringFormat='{0:F1} h'}"
                                FontSize="22" FontAttributes="Bold" TextColor="#7C3AED"/>
-                        <Label Text="pro Nacht" FontSize="12" TextColor="#9EAAB6"/>
                         <Label Text="{Binding TargetSleepHours, StringFormat='Ziel: {0:F1} h'}"
                                FontSize="11" TextColor="#1A73E8" FontAttributes="Bold"/>
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Streak -->
-                <Border Grid.Column="1" Grid.Row="0" BackgroundColor="White" StrokeThickness="0" Padding="16">
+                <Border Grid.Column="1" Grid.Row="0"
+                        BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
                     </Border.StrokeShape>
@@ -47,12 +53,14 @@
                                TextColor="#9EAAB6" CharacterSpacing="1"/>
                         <Label Text="{Binding CurrentStreak, StringFormat='🔥 {0} Tage'}"
                                FontSize="20" FontAttributes="Bold" TextColor="#E74C3C"/>
-                        <Label Text="aktuell" FontSize="12" TextColor="#9EAAB6"/>
+                        <Label Text="{Binding BestStreak, StringFormat='🏆 Rekord: {0}'}"
+                               FontSize="11" TextColor="#34A853" FontAttributes="Bold"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Qualität -->
-                <Border Grid.Column="0" Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="16">
+                <!-- Qualität Ø -->
+                <Border Grid.Column="0" Grid.Row="1"
+                        BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
                     </Border.StrokeShape>
@@ -64,12 +72,14 @@
                                TextColor="#9EAAB6" CharacterSpacing="1"/>
                         <Label Text="{Binding AverageSleepQuality, StringFormat='⭐ {0:F1}/5'}"
                                FontSize="20" FontAttributes="Bold" TextColor="#F39C12"/>
-                        <Label Text="Bewertung" FontSize="12" TextColor="#9EAAB6"/>
+                        <Label Text="{Binding GoalMetDaysText}"
+                               FontSize="11" TextColor="#1A73E8" FontAttributes="Bold"/>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Bester Streak -->
-                <Border Grid.Column="1" Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="16">
+                <!-- Konsistenz -->
+                <Border Grid.Column="1" Grid.Row="1"
+                        BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="14"/>
                     </Border.StrokeShape>
@@ -77,16 +87,92 @@
                         <Shadow Brush="#1A2535" Opacity="0.06" Radius="8" Offset="0,3"/>
                     </Border.Shadow>
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="BESTER STREAK" FontSize="10" FontAttributes="Bold"
+                        <Label Text="KONSISTENZ" FontSize="10" FontAttributes="Bold"
                                TextColor="#9EAAB6" CharacterSpacing="1"/>
-                        <Label Text="{Binding BestStreak, StringFormat='🏆 {0} Tage'}"
-                               FontSize="20" FontAttributes="Bold" TextColor="#34A853"/>
-                        <Label Text="Rekord" FontSize="12" TextColor="#9EAAB6"/>
+                        <Label Text="{Binding ConsistencyScoreText}"
+                               FontSize="20" FontAttributes="Bold" TextColor="#17A2B8"/>
+                        <Label Text="{Binding AverageFallAsleepText, StringFormat='Einschlafen: {0}'}"
+                               FontSize="11" TextColor="#9EAAB6"/>
                     </VerticalStackLayout>
                 </Border>
             </Grid>
 
-            <!-- Letzte Nächte -->
+            <!-- ══ TRAUMTAGEBUCH ══ -->
+            <Border x:Name="DreamSection" BackgroundColor="White" StrokeThickness="0" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.06" Radius="8" Offset="0,3"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="💭 Traumtagebuch"
+                               FontSize="15" FontAttributes="Bold" TextColor="#1A2535"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TotalDreams, StringFormat='{0} Träume'}"
+                               FontSize="12" TextColor="#9EAAB6" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Traumstimmungs-Verteilung -->
+                    <CollectionView ItemsSource="{Binding DreamMoodStats}" HeightRequest="36">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:DreamMoodCount">
+                                <Border BackgroundColor="#F3E8FF" Padding="10,6">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding DisplayText}" FontSize="12" TextColor="#7C3AED"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="Keine Träume aufgezeichnet" FontSize="13" TextColor="#9EAAB6"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding DreamEntries.Count, Converter={x:StaticResource IntToBoolConverter}, ConverterParameter=false}"/>
+
+                    <!-- Träume-Liste -->
+                    <CollectionView ItemsSource="{Binding DreamEntries}" HeightRequest="200">
+                        <CollectionView.EmptyView>
+                            <Label Text="Füge beim Eintragen einen Traumtext hinzu 🌙"
+                                   FontSize="12" TextColor="#9EAAB6" HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center" Margin="0,8"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SleepEntryDto">
+                                <Border BackgroundColor="#FAFAFA" StrokeThickness="0" Margin="0,0,0,6">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+                                    <Grid ColumnDefinitions="*,Auto" Padding="12,10" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                            <Label Text="{Binding BedTime, StringFormat='{0:dd.MM.yyyy}'}"
+                                                   FontSize="12" FontAttributes="Bold" TextColor="#1A2535"/>
+                                            <Label Text="{Binding DreamText}"
+                                                   FontSize="12" TextColor="#6C757D"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="2"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1"
+                                                Text="📖"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SleepStatsViewModel}}, Path=ViewDreamCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#EDE9FE" TextColor="#7C3AED"
+                                                FontSize="14" CornerRadius="8"
+                                                WidthRequest="40" HeightRequest="36" Padding="0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ══ LETZTE NÄCHTE mit Delete ══ -->
             <Label Text="LETZTE NÄCHTE" FontSize="11" FontAttributes="Bold"
                    TextColor="#9EAAB6" CharacterSpacing="1" Margin="4,4,4,0"/>
 
@@ -107,31 +193,71 @@
                             <Border.Shadow>
                                 <Shadow Brush="#1A2535" Opacity="0.05" Radius="6" Offset="0,2"/>
                             </Border.Shadow>
-                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="14,12">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" Padding="14,12">
+
+                                <!-- Icon -->
                                 <Frame Grid.Column="0" BackgroundColor="#EDE9FE" CornerRadius="10"
                                        WidthRequest="42" HeightRequest="42" HasShadow="False" Padding="0">
                                     <Label Text="🌙" FontSize="18"
                                            HorizontalOptions="Center" VerticalOptions="Center"/>
                                 </Frame>
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+
+                                <!-- Infos -->
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="3">
                                     <Label Text="{Binding BedTime, StringFormat='{0:dddd, dd.MM.}'}"
                                            FontSize="14" FontAttributes="Bold" TextColor="#1A2535"/>
                                     <HorizontalStackLayout Spacing="6">
                                         <Label Text="{Binding TotalSleepHours, StringFormat='{0:F1}h'}"
                                                FontSize="12" TextColor="#6C757D"/>
                                         <Label Text="·" FontSize="12" TextColor="#9EAAB6"/>
-                                        <Label Text="{Binding GoalStatusText}"
-                                               FontSize="12" TextColor="#6C757D"/>
+                                        <Label Text="{Binding SleepQuality, StringFormat='⭐{0}'}"
+                                               FontSize="12" TextColor="#F39C12"/>
                                     </HorizontalStackLayout>
+                                    <!-- Traumindikator -->
+                                    <Label FontSize="11" TextColor="#7C3AED"
+                                           IsVisible="{Binding DreamText, Converter={x:StaticResource StringNotNullOrEmptyBoolConverter}}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="💭 " />
+                                                <Span Text="{Binding DreamMood}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
                                 </VerticalStackLayout>
-                                <Label Grid.Column="2"
-                                       Text="{Binding SleepQuality, StringFormat='⭐{0}'}"
-                                       FontSize="14" VerticalOptions="Center" TextColor="#F39C12"/>
+
+                                <!-- Bearbeiten -->
+                                <Button Grid.Column="2" Text="✏️"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SleepStatsViewModel}}, Path=EditEntryCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#EBF2FF" TextColor="#1A73E8"
+                                        FontSize="13" CornerRadius="8"
+                                        WidthRequest="38" HeightRequest="36"
+                                        Padding="0" VerticalOptions="Center"/>
+
+                                <!-- Löschen -->
+                                <Button Grid.Column="3" Text="🗑️"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SleepStatsViewModel}}, Path=DeleteEntryCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#FEE2E2" TextColor="#E74C3C"
+                                        FontSize="13" CornerRadius="8"
+                                        WidthRequest="38" HeightRequest="36"
+                                        Padding="0" VerticalOptions="Center"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
+            <!-- Refresh -->
+            <Button Text="🔄  Aktualisieren"
+                    Command="{Binding LoadStatsCommand}"
+                    BackgroundColor="White" TextColor="#7C3AED"
+                    FontAttributes="Bold" FontSize="14"
+                    CornerRadius="12" HeightRequest="46" Margin="0,4,0,16">
+                <Button.Shadow>
+                    <Shadow Brush="#1A2535" Opacity="0.06" Radius="6" Offset="0,2"/>
+                </Button.Shadow>
+            </Button>
 
         </VerticalStackLayout>
     </ScrollView>

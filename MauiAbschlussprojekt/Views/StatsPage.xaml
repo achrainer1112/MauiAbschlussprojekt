@@ -11,11 +11,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Übersichtskacheln -->
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
                   ColumnSpacing="12" RowSpacing="12">
 
-                <!-- Aktueller Streak -->
                 <Border Grid.Column="0" Grid.Row="0"
                         BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>
@@ -33,7 +31,6 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Bester Streak -->
                 <Border Grid.Column="1" Grid.Row="0"
                         BackgroundColor="White" StrokeThickness="0" Padding="16">
                     <Border.StrokeShape>

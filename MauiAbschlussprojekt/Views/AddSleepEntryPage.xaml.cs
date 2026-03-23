@@ -12,23 +12,23 @@ public partial class AddSleepEntryPage : ContentPage
         _viewModel = viewModel;
         BindingContext = _viewModel;
 
-        // Button-Events verdrahten
+
         SaveButton.Clicked += OnSaveClicked;
         CancelButton.Clicked += OnCancelClicked;
 
-        // Picker-Optionen befüllen
+
         FallAsleepPicker.ItemsSource = new List<string>
             { "Schnell (<10 Min)", "Normal (10-20 Min)", "Mittel (20-30 Min)", "Lang (>30 Min)" };
         DreamMoodPicker.ItemsSource = new List<string>
             { "Positiv 😊", "Neutral 😐", "Negativ 😟", "Albtraum 😱" };
 
-        // Schlafdauer-Anzeige aktualisieren wenn Zeiten geändert
+
         BedTimePicker.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(TimePicker.Time)) UpdateDurationDisplay(); };
         WakeTimePicker.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(TimePicker.Time)) UpdateDurationDisplay(); };
         BedDatePicker.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(DatePicker.Date)) UpdateDurationDisplay(); };
         WakeDatePicker.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(DatePicker.Date)) UpdateDurationDisplay(); };
 
-        // Qualitäts-Slider
+
         QualitySlider.ValueChanged += (s, e) =>
         {
             int val = (int)Math.Round(e.NewValue);
@@ -44,7 +44,7 @@ public partial class AddSleepEntryPage : ContentPage
             };
         };
 
-        // Traumtagebuch-Stimmung nur zeigen wenn Text vorhanden
+
         DreamTextEditor.TextChanged += (s, e) =>
             DreamMoodSection.IsVisible = !string.IsNullOrWhiteSpace(e.NewTextValue);
     }
@@ -54,7 +54,7 @@ public partial class AddSleepEntryPage : ContentPage
         base.OnAppearing();
         await _viewModel.InitializeAsync();
 
-        // Initialwerte in UI schreiben (nach ViewModel-Init)
+
         BedDatePicker.Date = _viewModel.BedTime.Date;
         BedTimePicker.Time = _viewModel.BedTime.TimeOfDay;
         WakeDatePicker.Date = _viewModel.WakeTime.Date;
@@ -84,17 +84,17 @@ public partial class AddSleepEntryPage : ContentPage
         UpdateDurationDisplay();
     }
 
-    // ── Hilfsmethode: Date + Time sicher kombinieren (nullable-safe) ────────
+
     private static DateTime CombineDateTime(DateTime? date, TimeSpan? time)
         => (date ?? DateTime.Today).Date + (time ?? TimeSpan.Zero);
 
-    // ── Schlafdauer berechnen & anzeigen ────────────────────────────────────
+
     private void UpdateDurationDisplay()
     {
         var bedTime = CombineDateTime(BedDatePicker.Date, BedTimePicker.Time);
         var wakeTime = CombineDateTime(WakeDatePicker.Date, WakeTimePicker.Time);
 
-        // Wenn Aufwachzeit <= Bettzeit → automatisch nächster Tag
+
         if (wakeTime <= bedTime)
             wakeTime = wakeTime.AddDays(1);
 
@@ -110,7 +110,7 @@ public partial class AddSleepEntryPage : ContentPage
                 : string.Empty;
     }
 
-    // ── Speichern ────────────────────────────────────────────────────────────
+
     private async void OnSaveClicked(object? sender, EventArgs e)
     {
         var bedTime = CombineDateTime(BedDatePicker.Date, BedTimePicker.Time);
@@ -151,7 +151,7 @@ public partial class AddSleepEntryPage : ContentPage
         LoadingIndicator.IsVisible = false;
     }
 
-    // ── Abbrechen ───────────────────────────────────────────────────────────
+
     private async void OnCancelClicked(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("..");
 }

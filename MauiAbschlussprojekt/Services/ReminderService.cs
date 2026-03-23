@@ -1,4 +1,4 @@
-﻿using Plugin.LocalNotification;
+using Plugin.LocalNotification;
 
 namespace MauiAbschlussprojekt.Services
 {
@@ -16,7 +16,6 @@ namespace MauiAbschlussprojekt.Services
         private Timer? _waterNotificationTimer;
         private Timer? _sleepReminderTimer;
 
-        // ── Berechtigungen ────────────────────────────────────────────────────
         public async Task<bool> RequestPermissionAsync()
         {
 #if ANDROID || IOS
@@ -39,7 +38,6 @@ namespace MauiAbschlussprojekt.Services
 #endif
         }
 
-        // ── Wasser-Erinnerungen (periodisch) ─────────────────────────────────
         public void StartPeriodicNotifications(int intervalMinutes, int startHour, int endHour)
         {
 #if ANDROID || IOS
@@ -74,32 +72,21 @@ namespace MauiAbschlussprojekt.Services
 #endif
         }
 
-        // ── Schlaf-Erinnerung (täglich 1h vor Schlafenszeit) ─────────────────
-        /// <summary>
-        /// Plant eine tägliche Schlaf-Erinnerung 1 Stunde vor der Ziel-Schlafenszeit.
-        /// Der Timer prüft jede Minute ob die Erinnerungszeit erreicht ist und
-        /// sendet dann genau einmal pro Tag eine Benachrichtigung.
-        /// Beispiel: bedTimeHour=23, bedTimeMinute=30 → Erinnerung täglich um 22:30.
-        /// </summary>
         public void ScheduleDailySleepReminder(int bedTimeHour, int bedTimeMinute)
         {
 #if ANDROID || IOS
             CancelSleepReminder();
 
-            // Erinnerungszeit = 1 Stunde vor Schlafenszeit
-            // bedTimeHour kann 0–27 sein (Werte >23 = nach Mitternacht)
             int realBedHour = bedTimeHour % 24;
             int reminderHour = realBedHour == 0 ? 23 : realBedHour - 1;
             int reminderMinute = bedTimeMinute;
 
-            // Merken wann zuletzt gefeuert, damit pro Tag nur 1x
             DateTime lastFired = DateTime.MinValue;
 
             _sleepReminderTimer = new Timer(_ =>
             {
                 var now = DateTime.Now;
 
-                // Feuere wenn Stunde+Minute übereinstimmt und heute noch nicht gefeuert
                 if (now.Hour == reminderHour &&
                     now.Minute == reminderMinute &&
                     now.Date != lastFired.Date)
@@ -122,7 +109,6 @@ namespace MauiAbschlussprojekt.Services
 #endif
         }
 
-        // ── Private: Notifications anzeigen ──────────────────────────────────
 #if ANDROID || IOS
         private async void ShowWaterNotification()
         {
@@ -131,7 +117,7 @@ namespace MauiAbschlussprojekt.Services
                 await LocalNotificationCenter.Current.Show(new NotificationRequest
                 {
                     NotificationId = 1000,
-                    Title = "💧 Trink-Erinnerung",
+                    Title = "?? Trink-Erinnerung",
                     Description = "Zeit, etwas Wasser zu trinken!",
                     BadgeNumber = 1,
                     CategoryType = NotificationCategoryType.Status
@@ -152,7 +138,7 @@ namespace MauiAbschlussprojekt.Services
                 await LocalNotificationCenter.Current.Show(new NotificationRequest
                 {
                     NotificationId = 2000,
-                    Title = "😴 Zeit zum Schlafen!",
+                    Title = "?? Zeit zum Schlafen!",
                     Description = $"In 1 Stunde ist deine Schlafenszeit ({bedTimeStr}). Bereite dich auf den Schlaf vor.",
                     BadgeNumber = 1,
                     CategoryType = NotificationCategoryType.Status

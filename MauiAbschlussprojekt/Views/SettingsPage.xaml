@@ -34,7 +34,6 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- PROFIL -->
             <Label Text="PROFIL" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -61,7 +60,6 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
-                        <!-- FIX: WeightKg → WeightInput -->
                         <Entry Text="{Binding WeightInput}"
                                Keyboard="Numeric" FontSize="15" TextColor="#1A2535"
                                BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
@@ -72,7 +70,6 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
-                        <!-- FIX: ActivityLevelOptions → ActivityLevels -->
                         <Picker ItemsSource="{Binding ActivityLevels}"
                                 ItemDisplayBinding="{Binding Display}"
                                 SelectedItem="{Binding SelectedActivityLevel}"
@@ -92,7 +89,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- WASSER-TRACKER -->
             <Label Text="WASSER-TRACKER" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -109,7 +105,6 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
-                        <!-- FIX: DailyGoalMl → CustomGoalInput -->
                         <Entry Text="{Binding CustomGoalInput}"
                                Keyboard="Numeric" FontSize="15" TextColor="#1A2535"
                                BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
@@ -131,7 +126,6 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="10"/>
                             </Border.StrokeShape>
-                            <!-- FIX: ReminderIntervalMinutes → ReminderIntervalInput -->
                             <Entry Text="{Binding ReminderIntervalInput}"
                                    Keyboard="Numeric" FontSize="15" TextColor="#1A2535"
                                    BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
@@ -161,7 +155,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- SCHLAF-TRACKER -->
             <Label Text="SCHLAF-TRACKER" Style="{StaticResource SectionTitle}" Margin="4,4,4,0"/>
 
             <Border Style="{StaticResource Card}">

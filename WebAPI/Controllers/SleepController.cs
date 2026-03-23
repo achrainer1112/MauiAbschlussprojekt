@@ -7,7 +7,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SleepController : ControllerBase
+    public class SleepController : BaseController
     {
         private readonly DbManager _context;
 
@@ -16,15 +16,19 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/sleep/recent/{userId}?days=7
-        [HttpGet("recent/{userId}")]
-        public async Task<ActionResult<List<SleepEntryDto>>> GetRecentEntries(int userId, [FromQuery] int days = 7)
+        [HttpGet("recent")]
+        public async Task<ActionResult<List<SleepEntryDto>>> GetRecentEntries([FromQuery] int days = 7)
         {
-            var startDate = DateTime.UtcNow.Date.AddDays(-days);
+            var userId = GetUserIdFromToken();
+            var startDate = DateTime.Now.Date.AddDays(-days);
 
-            var entries = await _context.SleepEntries
-                .Where(s => s.UserId == userId && s.BedTime.Date >= startDate)
-                .OrderByDescending(s => s.BedTime)
+            var all = await _context.SleepEntries
+                .Where(s => s.UserId == userId)
+                .ToListAsync();
+
+            var entries = all
+                .Where(s => s.WakeTime.ToLocalTime().Date >= startDate)
+                .OrderByDescending(s => s.WakeTime)
                 .Select(s => new SleepEntryDto
                 {
                     Id = s.Id,
@@ -39,15 +43,15 @@ namespace WebAPI.Controllers
                     CreatedAt = s.CreatedAt,
                     TotalSleepHours = (s.WakeTime - s.BedTime).TotalHours
                 })
-                .ToListAsync();
+                .ToList();
 
             return Ok(entries);
         }
 
-        // POST: api/sleep/add
         [HttpPost("add")]
-        public async Task<ActionResult<SleepEntryDto>> AddSleepEntry([FromBody] AddSleepEntryRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<SleepEntryDto>> AddSleepEntry([FromBody] AddSleepEntryRequest request)
         {
+            var userId = GetUserIdFromToken();
             var entry = new SleepEntry
             {
                 UserId = userId,
@@ -79,10 +83,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        // PUT: api/sleep/update
         [HttpPut("update")]
-        public async Task<ActionResult<SleepEntryDto>> UpdateSleepEntry([FromBody] UpdateSleepEntryRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<SleepEntryDto>> UpdateSleepEntry([FromBody] UpdateSleepEntryRequest request)
         {
+            var userId = GetUserIdFromToken();
             var entry = await _context.SleepEntries
                 .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == userId);
 
@@ -115,10 +119,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        // DELETE: api/sleep/delete/{id}
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult> DeleteSleepEntry(int id, [FromQuery] int userId)
+        public async Task<ActionResult> DeleteSleepEntry(int id)
         {
+            var userId = GetUserIdFromToken();
             var entry = await _context.SleepEntries
                 .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
@@ -131,29 +135,27 @@ namespace WebAPI.Controllers
             return Ok(new { message = "Eintrag gelöscht" });
         }
 
-
-        // GET: api/sleep/stats/week/{userId}
-        [HttpGet("stats/week/{userId}")]
-        public async Task<ActionResult<WeekSleepStatsDto>> GetWeekStats(int userId)
+        [HttpGet("stats/week")]
+        public async Task<ActionResult<WeekSleepStatsDto>> GetWeekStats()
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
             var targetHours = user.TargetSleepHours;
-            var today = DateTime.UtcNow.Date;
+            var today = DateTime.Now.Date;
             var weekAgo = today.AddDays(-6);
 
-            // Letzte 7 Tage für die Tageskacheln
-            var weekEntries = await _context.SleepEntries
-                .Where(s => s.UserId == userId && s.BedTime.Date >= weekAgo && s.BedTime.Date <= today)
+            var allEntries = await _context.SleepEntries
+                .Where(s => s.UserId == userId)
                 .ToListAsync();
 
             var dailyStats = new List<DailySleepStatsDto>();
             for (int i = 6; i >= 0; i--)
             {
                 var date = today.AddDays(-i);
-                var dayEntry = weekEntries.FirstOrDefault(e => e.BedTime.Date == date);
+                var dayEntry = allEntries.FirstOrDefault(e => e.WakeTime.ToLocalTime().Date == date);
 
                 if (dayEntry != null)
                 {
@@ -180,19 +182,17 @@ namespace WebAPI.Controllers
                 }
             }
 
-            // === STREAK: Alle Einträge laden, nicht nur letzte 7 Tage ===
-            var allEntries = await _context.SleepEntries
-                .Where(s => s.UserId == userId)
-                .OrderByDescending(s => s.BedTime)
-                .ToListAsync();
 
-            // Current Streak: von heute rückwärts, Tag für Tag prüfen
+            // Latest Streak
             int currentStreak = 0;
-            var checkDate = today;
 
-            // Erlaube auch gestern als Startpunkt (falls heute noch kein Eintrag)
-            var hasToday = allEntries.Any(e => e.BedTime.Date == today && e.TotalSleepHours >= targetHours);
-            var hasYesterday = allEntries.Any(e => e.BedTime.Date == today.AddDays(-1) && e.TotalSleepHours >= targetHours);
+            var hasToday = allEntries.Any(e =>
+                e.WakeTime.ToLocalTime().Date == today &&
+                e.TotalSleepHours >= targetHours);
+
+            var hasYesterday = allEntries.Any(e =>
+                e.WakeTime.ToLocalTime().Date == today.AddDays(-1) &&
+                e.TotalSleepHours >= targetHours);
 
             if (!hasToday && !hasYesterday)
             {
@@ -200,36 +200,39 @@ namespace WebAPI.Controllers
             }
             else
             {
-                if (!hasToday)
-                    checkDate = today.AddDays(-1); // Streak startet gestern
+                var checkDate = hasToday ? today : today.AddDays(-1);
 
                 while (true)
                 {
-                    var met = allEntries.Any(e => e.BedTime.Date == checkDate && e.TotalSleepHours >= targetHours);
+                    var met = allEntries.Any(e =>
+                        e.WakeTime.ToLocalTime().Date == checkDate &&
+                        e.TotalSleepHours >= targetHours);
+
                     if (met)
                     {
                         currentStreak++;
                         checkDate = checkDate.AddDays(-1);
                     }
-                    else
-                    {
-                        break;
-                    }
+                    else break;
                 }
             }
 
-            // Best Streak: alle Einträge chronologisch durchgehen
+
+            //Best Streak
             int bestStreak = 0;
             int tempStreak = 0;
 
             if (allEntries.Any())
             {
-                var minDate = allEntries.Min(e => e.BedTime.Date);
+                var minDate = allEntries.Min(e => e.WakeTime.ToLocalTime().Date);
                 var cursor = minDate;
 
                 while (cursor <= today)
                 {
-                    var met = allEntries.Any(e => e.BedTime.Date == cursor && e.TotalSleepHours >= targetHours);
+                    var met = allEntries.Any(e =>
+                        e.WakeTime.ToLocalTime().Date == cursor &&
+                        e.TotalSleepHours >= targetHours);
+
                     if (met)
                     {
                         tempStreak++;
@@ -240,6 +243,7 @@ namespace WebAPI.Controllers
                     {
                         tempStreak = 0;
                     }
+
                     cursor = cursor.AddDays(1);
                 }
             }
@@ -261,16 +265,21 @@ namespace WebAPI.Controllers
             });
         }
 
-        // GET: api/sleep/stats/detailed/{userId}
-        [HttpGet("stats/detailed/{userId}")]
-        public async Task<ActionResult<SleepStatsDto>> GetDetailedStats(int userId, [FromQuery] int days = 30)
+        [HttpGet("stats/detailed")]
+        public async Task<ActionResult<SleepStatsDto>> GetDetailedStats([FromQuery] int days = 30)
         {
-            var startDate = DateTime.UtcNow.Date.AddDays(-days);
+            var userId = GetUserIdFromToken();
+            var startDate = DateTime.Now.Date.AddDays(-days);
 
-            var entries = await _context.SleepEntries
-                .Where(s => s.UserId == userId && s.BedTime.Date >= startDate)
-                .OrderByDescending(s => s.BedTime)
+            var all = await _context.SleepEntries
+                .Where(s => s.UserId == userId)
                 .ToListAsync();
+
+
+            var entries = all
+                .Where(s => s.WakeTime.ToLocalTime().Date >= startDate)
+                .OrderByDescending(s => s.WakeTime)
+                .ToList();
 
             if (!entries.Any())
             {
@@ -283,11 +292,9 @@ namespace WebAPI.Controllers
                 });
             }
 
-            // Calculate averages
             var avgSleepHours = entries.Average(e => e.TotalSleepHours);
             var avgQuality = entries.Average(e => e.SleepQuality);
 
-            // Average fall asleep minutes
             var fallAsleepMinutes = entries.Select(e => e.FallAsleepDurationCategory switch
             {
                 "Fast" => 10.0,
@@ -297,22 +304,19 @@ namespace WebAPI.Controllers
                 _ => 22.5
             }).Average();
 
-            // Calculate average bed/wake times
-            var avgBedMinutes = entries.Average(e => e.BedTime.Hour * 60 + e.BedTime.Minute);
-            var avgWakeMinutes = entries.Average(e => e.WakeTime.Hour * 60 + e.WakeTime.Minute);
 
-            // Best and worst nights
+            var avgBedMinutes = entries.Average(e => e.BedTime.ToLocalTime().Hour * 60 + e.BedTime.ToLocalTime().Minute);
+            var avgWakeMinutes = entries.Average(e => e.WakeTime.ToLocalTime().Hour * 60 + e.WakeTime.ToLocalTime().Minute);
+
             var bestNight = entries.OrderByDescending(e => e.SleepQuality).ThenByDescending(e => e.TotalSleepHours).First();
             var worstNight = entries.OrderBy(e => e.SleepQuality).ThenBy(e => e.TotalSleepHours).First();
 
-            // Dream statistics
             var dreamEntries = entries.Where(e => !string.IsNullOrEmpty(e.DreamText)).ToList();
             var dreamMoodCounts = dreamEntries
                 .Where(e => !string.IsNullOrEmpty(e.DreamMood))
                 .GroupBy(e => e.DreamMood!)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            // Consistency score (based on variance in bed times)
             var bedTimeVariance = CalculateTimeVariance(entries.Select(e => e.BedTime).ToList());
             var consistencyScore = Math.Max(0, Math.Min(100, 100 - (int)(bedTimeVariance * 10)));
 
@@ -328,36 +332,35 @@ namespace WebAPI.Controllers
                 WorstNight = MapToDto(worstNight),
                 TotalDreams = dreamEntries.Count,
                 DreamMoodCounts = dreamMoodCounts,
-                RecentEntries = entries.Take(10).Select(MapToDto).ToList()
+                RecentEntries = entries.Take(20).Select(MapToDto).ToList()
             });
         }
+
+
+        // ── Hilfsmethoden ──────────────────────────────────────────────────
 
         private double CalculateTimeVariance(List<DateTime> times)
         {
             if (times.Count < 2) return 0;
-
-            var minutes = times.Select(t => t.Hour * 60 + t.Minute).ToList();
+            var minutes = times.Select(t => t.ToLocalTime().Hour * 60 + t.ToLocalTime().Minute).ToList();
             var mean = minutes.Average();
             var variance = minutes.Select(m => Math.Pow(m - mean, 2)).Average();
-            return Math.Sqrt(variance) / 60.0; // Convert to hours
+            return Math.Sqrt(variance) / 60.0;
         }
 
-        private SleepEntryDto MapToDto(SleepEntry entry)
+        private SleepEntryDto MapToDto(SleepEntry entry) => new SleepEntryDto
         {
-            return new SleepEntryDto
-            {
-                Id = entry.Id,
-                UserId = entry.UserId,
-                BedTime = entry.BedTime,
-                WakeTime = entry.WakeTime,
-                FallAsleepDurationCategory = entry.FallAsleepDurationCategory,
-                SleepQuality = entry.SleepQuality,
-                DreamText = entry.DreamText,
-                DreamMood = entry.DreamMood,
-                Notes = entry.Notes,
-                CreatedAt = entry.CreatedAt,
-                TotalSleepHours = entry.TotalSleepHours
-            };
-        }
+            Id = entry.Id,
+            UserId = entry.UserId,
+            BedTime = entry.BedTime,
+            WakeTime = entry.WakeTime,
+            FallAsleepDurationCategory = entry.FallAsleepDurationCategory,
+            SleepQuality = entry.SleepQuality,
+            DreamText = entry.DreamText,
+            DreamMood = entry.DreamMood,
+            Notes = entry.Notes,
+            CreatedAt = entry.CreatedAt,
+            TotalSleepHours = entry.TotalSleepHours
+        };
     }
 }

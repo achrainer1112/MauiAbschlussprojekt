@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
@@ -25,7 +25,7 @@ namespace Models
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation Property
+
         [ForeignKey("UserId")]
         public User User { get; set; } = null!;
     }

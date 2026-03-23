@@ -1,4 +1,4 @@
-ï»¿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models
 {
@@ -9,7 +9,7 @@ namespace Models
         public string Username { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email ist erforderlich")]
-        [EmailAddress(ErrorMessage = "UngÃ¼ltige Email-Adresse")]
+        [EmailAddress(ErrorMessage = "Ungültige Email-Adresse")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Passwort ist erforderlich")]
@@ -24,7 +24,7 @@ namespace Models
     public class LoginRequest
     {
         [Required(ErrorMessage = "Email ist erforderlich")]
-        [EmailAddress(ErrorMessage = "UngÃ¼ltige Email-Adresse")]
+        [EmailAddress(ErrorMessage = "Ungültige Email-Adresse")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Passwort ist erforderlich")]
@@ -46,7 +46,7 @@ namespace Models
         public string Email { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
 
-        // Water Tracker Settings
+
         public double? WeightKg { get; set; }
         public string? ActivityLevel { get; set; }
         public int? DailyWaterGoalMl { get; set; }
@@ -55,7 +55,7 @@ namespace Models
         public int ReminderStartHour { get; set; }
         public int ReminderEndHour { get; set; }
 
-        // Sleep Tracker Settings
+
         public double TargetSleepHours { get; set; }
         public int TargetBedTimeHour { get; set; }
         public int TargetBedTimeMinute { get; set; }

@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Models;
@@ -40,17 +40,12 @@ namespace MauiAbschlussprojekt.Services
             }
         }
 
-        // === SLEEP ENTRIES ===
-
         public async Task<List<SleepEntryDto>> GetRecentEntriesAsync(int days = 7)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return new List<SleepEntryDto>();
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/recent/{_apiService.CurrentUserId}?days={days}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/recent?days={days}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -68,16 +63,13 @@ namespace MauiAbschlussprojekt.Services
 
         public async Task<SleepEntryDto?> AddSleepEntryAsync(AddSleepEntryRequest request)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{BaseUrl}/sleep/add?userId={_apiService.CurrentUserId}", content);
+                var response = await _httpClient.PostAsync($"{BaseUrl}/sleep/add", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -95,16 +87,13 @@ namespace MauiAbschlussprojekt.Services
 
         public async Task<SleepEntryDto?> UpdateSleepEntryAsync(UpdateSleepEntryRequest request)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{BaseUrl}/sleep/update?userId={_apiService.CurrentUserId}", content);
+                var response = await _httpClient.PutAsync($"{BaseUrl}/sleep/update", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -122,13 +111,10 @@ namespace MauiAbschlussprojekt.Services
 
         public async Task<bool> DeleteSleepEntryAsync(int entryId)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return false;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.DeleteAsync($"{BaseUrl}/sleep/delete/{entryId}?userId={_apiService.CurrentUserId}");
+                var response = await _httpClient.DeleteAsync($"{BaseUrl}/sleep/delete/{entryId}");
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -137,17 +123,12 @@ namespace MauiAbschlussprojekt.Services
             }
         }
 
-        // === STATISTICS ===
-
         public async Task<WeekSleepStatsDto?> GetWeekStatsAsync()
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/stats/week/{_apiService.CurrentUserId}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/stats/week");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -165,13 +146,10 @@ namespace MauiAbschlussprojekt.Services
 
         public async Task<SleepStatsDto?> GetDetailedStatsAsync(int days = 30)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/stats/detailed/{_apiService.CurrentUserId}?days={days}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/sleep/stats/detailed?days={days}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -187,20 +165,15 @@ namespace MauiAbschlussprojekt.Services
             }
         }
 
-        // === SLEEP SETTINGS ===
-
         public async Task<UserDto?> UpdateSleepSettingsAsync(UpdateSleepSettingsRequest request)
         {
-            if (!_apiService.CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{BaseUrl}/user/sleep-settings?userId={_apiService.CurrentUserId}", content);
+                var response = await _httpClient.PutAsync($"{BaseUrl}/user/sleep-settings", content);
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly DbManager _context;
 
@@ -16,9 +16,10 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<UserDto>> GetUser(int userId)
+        [HttpGet]
+        public async Task<ActionResult<UserDto>> GetUser()
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
@@ -27,13 +28,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UpdateUserRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UpdateUserRequest request)
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
 
-            // Username aktualisieren (neu)
+
             if (!string.IsNullOrWhiteSpace(request.Username))
                 user.Username = request.Username;
 
@@ -65,8 +67,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("reminder-settings")]
-        public async Task<ActionResult<UserDto>> UpdateReminderSettings([FromBody] UpdateReminderRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<UserDto>> UpdateReminderSettings([FromBody] UpdateReminderRequest request)
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
@@ -88,8 +91,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("sleep-settings")]
-        public async Task<ActionResult<UserDto>> UpdateSleepSettings([FromBody] UpdateSleepSettingsRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<UserDto>> UpdateSleepSettings([FromBody] UpdateSleepSettingsRequest request)
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });

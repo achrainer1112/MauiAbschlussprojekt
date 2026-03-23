@@ -44,7 +44,6 @@
 	<ScrollView>
 		<VerticalStackLayout Padding="24,48,24,32" Spacing="16">
 
-			<!-- Zurück + Titel -->
 			<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,8">
 				<Label Grid.Column="0"
                        Text="←"
@@ -63,7 +62,6 @@
 				</VerticalStackLayout>
 			</Grid>
 
-			<!-- Account-Daten -->
 			<Border BackgroundColor="#1A2535" StrokeThickness="1" Stroke="#2A3D52" Padding="18">
 				<Border.StrokeShape>
 					<RoundRectangle CornerRadius="14"/>

@@ -38,7 +38,6 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private string bedTimeDisplay = string.Empty;
 
-        // NEU: direkt als ObservableProperty statt berechnete Property
         [ObservableProperty]
         private double lastNightProgress;
 
@@ -88,7 +87,6 @@ namespace MauiAbschlussprojekt.ViewModels
                     LastNightQuality = lastNight.SleepQuality;
                     LastNightSummary = $"{lastNight.TotalSleepHours:F1}h geschlafen • {GetQualityText(lastNight.SleepQuality)}";
 
-                    // Progress direkt berechnen und setzen
                     LastNightProgress = TargetSleepHours > 0
                         ? Math.Min(lastNight.TotalSleepHours / TargetSleepHours, 1.0)
                         : 0.0;
@@ -149,13 +147,23 @@ namespace MauiAbschlussprojekt.ViewModels
             await Shell.Current.GoToAsync("SleepStatsPage");
         }
 
+        /// <summary>
+        /// Navigiert zur SleepStatsPage und scrollt dort zum Traumtagebuch-Bereich.
+        /// Da wir keine direkte Scroll-Navigation haben, übergeben wir einen Parameter.
+        /// </summary>
+        [RelayCommand]
+        private async Task NavigateToDreamsAsync()
+        {
+            await Shell.Current.GoToAsync("SleepStatsPage?showDreams=true");
+        }
+
         [RelayCommand]
         private async Task DeleteEntryAsync(SleepEntryDto entry)
         {
             bool confirm = await Shell.Current.DisplayAlert(
                 "Löschen",
                 $"Eintrag vom {entry.BedTime:dd.MM.yyyy} wirklich löschen?",
-                "Ja", "Nein");
+                "Ja, löschen", "Abbrechen");
 
             if (!confirm) return;
 
@@ -165,7 +173,28 @@ namespace MauiAbschlussprojekt.ViewModels
                 if (success)
                 {
                     RecentEntries.Remove(entry);
-                    await LoadDataAsync();
+                    // Letzte-Nacht-Anzeige aktualisieren
+                    var newLast = RecentEntries.FirstOrDefault();
+                    if (newLast != null)
+                    {
+                        HasLastNightData = true;
+                        LastNightSleepHours = newLast.TotalSleepHours;
+                        LastNightQuality = newLast.SleepQuality;
+                        LastNightSummary = $"{newLast.TotalSleepHours:F1}h geschlafen • {GetQualityText(newLast.SleepQuality)}";
+                        LastNightProgress = TargetSleepHours > 0
+                            ? Math.Min(newLast.TotalSleepHours / TargetSleepHours, 1.0)
+                            : 0.0;
+                    }
+                    else
+                    {
+                        HasLastNightData = false;
+                        LastNightSummary = "Noch keine Daten";
+                        LastNightProgress = 0.0;
+                    }
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Fehler", "Löschen fehlgeschlagen.", "OK");
                 }
             }
             catch (Exception ex)
@@ -182,11 +211,11 @@ namespace MauiAbschlussprojekt.ViewModels
 
         private static string GetQualityText(int quality) => quality switch
         {
-            5 => "Ausgezeichnet",
-            4 => "Gut",
-            3 => "OK",
-            2 => "Schlecht",
-            1 => "Sehr schlecht",
+            5 => "Ausgezeichnet 😄",
+            4 => "Gut 🙂",
+            3 => "OK 😐",
+            2 => "Schlecht 😕",
+            1 => "Sehr schlecht 😴",
             _ => "Unbekannt"
         };
     }

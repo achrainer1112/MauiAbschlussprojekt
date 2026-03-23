@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ORM.Migrations
 {
-    /// <inheritdoc />
+
     public partial class initialCreate : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -129,7 +129,7 @@ namespace ORM.Migrations
                 columns: new[] { "user_id", "logged_at" });
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

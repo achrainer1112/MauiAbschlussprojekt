@@ -19,14 +19,11 @@ namespace MauiAbschlussprojekt.Views
             base.OnAppearing();
             await _viewModel.InitializeAsync();
 
-            // Flyout-Header aktualisieren
             if (Shell.Current is AppShell appShell)
                 appShell.UpdateFlyoutHeader();
 
-            // Kreis zeichnen
             UpdateCircle();
 
-            // Auf Property-Änderungen lauschen
             _viewModel.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(MainViewModel.ProgressPercentage))
@@ -43,11 +40,11 @@ namespace MauiAbschlussprojekt.Views
 
     public class WaterArcDrawable : IDrawable
     {
-        private readonly double _progress; // 0.0 – 1.0+
+        private readonly double _progress;
 
         public WaterArcDrawable(double progress)
         {
-            _progress = Math.Max(progress, 0.0); // kein Clamp nach oben!
+            _progress = Math.Max(progress, 0.0);
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -61,13 +58,11 @@ namespace MauiAbschlussprojekt.Views
             float top = cy - radius;
             float size = radius * 2f;
 
-            // 1. Hintergrundkreis — immer grau
             canvas.StrokeColor = Color.FromArgb("#E8EDF2");
             canvas.StrokeSize = strokeWidth;
             canvas.StrokeLineCap = LineCap.Round;
             canvas.DrawCircle(cx, cy, radius);
 
-            // 2. Bei 100%+ → kompletten Kreis blau zeichnen
             if (_progress >= 1.0)
             {
                 canvas.StrokeColor = Color.FromArgb("#1A73E8");
@@ -77,7 +72,6 @@ namespace MauiAbschlussprojekt.Views
                 return;
             }
 
-            // 3. Teilweise gefüllt → blauer Arc
             float filledAngle = (float)(_progress * 360.0);
             float emptyAngle = 360f - filledAngle;
 

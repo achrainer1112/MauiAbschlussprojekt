@@ -128,14 +128,14 @@ namespace MauiAbschlussprojekt.ViewModels
                     Password = Password
                 };
 
-                // Optional: Gewicht und Aktivitätslevel
+
                 if (double.TryParse(WeightInput, out double weight) && weight > 0)
                 {
                     request.WeightKg = weight;
                     request.ActivityLevel = SelectedActivityLevel.Value;
                 }
 
-                // Custom Goal falls angegeben
+
                 if (ShowCustomGoal && int.TryParse(CustomGoalInput, out int customGoal) && customGoal > 0)
                 {
                     request.CustomDailyGoalMl = customGoal;

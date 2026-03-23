@@ -1,4 +1,4 @@
-﻿using MauiAbschlussprojekt.Services;
+using MauiAbschlussprojekt.Services;
 using MauiAbschlussprojekt.Views;
 using Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;
 
@@ -16,8 +16,6 @@ namespace MauiAbschlussprojekt
 
             FlyoutBehavior = FlyoutBehavior.Disabled;
 
-
-            // Visuellen State des ausgewählten Items überschreiben
             var style = new Microsoft.Maui.Controls.Style(typeof(Grid));
             var vsg = new VisualStateGroupList();
             var vg = new VisualStateGroup { Name = "CommonStates" };

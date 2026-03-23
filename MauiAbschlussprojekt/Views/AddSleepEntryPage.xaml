@@ -28,7 +28,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Dauer-Zusammenfassung -->
+            
             <Border BackgroundColor="#EDE9FE" StrokeThickness="2" Stroke="#7C3AED" Padding="16">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="14"/>
@@ -45,7 +45,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Schlafzeiten -->
+            
             <Label Text="SCHLAFZEITEN" Style="{StaticResource SectionTitle}" Margin="4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -57,7 +57,7 @@
                 </Border.Shadow>
                 <VerticalStackLayout Spacing="14">
 
-                    <!-- Ins Bett -->
+                    
                     <Label Text="Ins Bett gegangen" FontSize="14" FontAttributes="Bold" TextColor="#1A2535"/>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <VerticalStackLayout Grid.Column="0" Spacing="4">
@@ -82,7 +82,7 @@
                         </VerticalStackLayout>
                     </Grid>
 
-                    <!-- Aufgewacht -->
+                    
                     <Label Text="Aufgewacht" FontSize="14" FontAttributes="Bold"
                            TextColor="#1A2535" Margin="0,8,0,0"/>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
@@ -111,7 +111,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Einschlafdauer -->
+            
             <Label Text="EINSCHLAFDAUER" Style="{StaticResource SectionTitle}" Margin="4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -133,7 +133,7 @@
                 </Border>
             </Border>
 
-            <!-- Schlafqualität -->
+            
             <Label Text="SCHLAFQUALITÄT" Style="{StaticResource SectionTitle}" Margin="4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -167,7 +167,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Traumtagebuch -->
+            
             <Label Text="TRAUMTAGEBUCH (OPTIONAL)" Style="{StaticResource SectionTitle}" Margin="4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -202,7 +202,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Notizen -->
+            
             <Label Text="NOTIZEN (OPTIONAL)" Style="{StaticResource SectionTitle}" Margin="4,0"/>
 
             <Border Style="{StaticResource Card}">
@@ -221,7 +221,7 @@
                         AutoSize="TextChanges"/>
             </Border>
 
-            <!-- Buttons -->
+            
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,4,0,0">
                 <Button Grid.Column="0"
                         x:Name="CancelButton"

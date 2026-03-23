@@ -8,7 +8,7 @@ namespace MauiAbschlussprojekt.ViewModels
     public partial class LoginViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
-        private readonly IReminderService _reminderService; 
+        private readonly IReminderService _reminderService;
 
         [ObservableProperty]
         private string email = string.Empty;
@@ -22,10 +22,10 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private bool isLoading;
 
-        public LoginViewModel(ApiService apiService, IReminderService reminderService) // neu
+        public LoginViewModel(ApiService apiService, IReminderService reminderService)
         {
             _apiService = apiService;
-            _reminderService = reminderService; // neu
+            _reminderService = reminderService;
         }
 
         [RelayCommand]
@@ -52,7 +52,6 @@ namespace MauiAbschlussprojekt.ViewModels
 
                 if (response.Success)
                 {
-                    // Reminder beim Login wiederherstellen
                     if (response.User?.ReminderEnabled == true)
                     {
                         await _reminderService.RequestPermissionAsync();

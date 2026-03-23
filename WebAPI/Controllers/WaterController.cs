@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WaterController : ControllerBase
+    public class WaterController : BaseController
     {
         private readonly DbManager _context;
 
@@ -17,10 +17,10 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/water/today/{userId}
-        [HttpGet("today/{userId}")]
-        public async Task<ActionResult<List<WaterEntryDto>>> GetTodayEntries(int userId)
+        [HttpGet("today")]
+        public async Task<ActionResult<List<WaterEntryDto>>> GetTodayEntries()
         {
+            var userId = GetUserIdFromToken();
             var today = DateTime.UtcNow.Date;
             var entries = await _context.WaterEntries
                 .Where(w => w.UserId == userId && w.LoggedAt.Date == today)
@@ -38,10 +38,10 @@ namespace WebAPI.Controllers
             return Ok(entries);
         }
 
-        // POST: api/water/add
         [HttpPost("add")]
-        public async Task<ActionResult<WaterEntryDto>> AddWater([FromBody] AddWaterRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<WaterEntryDto>> AddWater([FromBody] AddWaterRequest request)
         {
+            var userId = GetUserIdFromToken();
             var entry = new WaterEntry
             {
                 UserId = userId,
@@ -62,10 +62,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        // PUT: api/water/update
         [HttpPut("update")]
-        public async Task<ActionResult<WaterEntryDto>> UpdateWater([FromBody] UpdateWaterEntryRequest request, [FromQuery] int userId)
+        public async Task<ActionResult<WaterEntryDto>> UpdateWater([FromBody] UpdateWaterEntryRequest request)
         {
+            var userId = GetUserIdFromToken();
             var entry = await _context.WaterEntries
                 .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == userId);
 
@@ -88,10 +88,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        // DELETE: api/water/delete/{id}
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult> DeleteWater(int id, [FromQuery] int userId)
+        public async Task<ActionResult> DeleteWater(int id)
         {
+            var userId = GetUserIdFromToken();
             var entry = await _context.WaterEntries
                 .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
 
@@ -101,13 +101,14 @@ namespace WebAPI.Controllers
             _context.WaterEntries.Remove(entry);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Eintrag gelöscht" });
+            return Ok(new { message = "Eintrag gel�scht" });
         }
 
-        // GET: api/water/stats/week/{userId}
-        [HttpGet("stats/week/{userId}")]
-        public async Task<ActionResult<WeekStatsDto>> GetWeekStats(int userId)
+
+        [HttpGet("stats/week")]
+        public async Task<ActionResult<WeekStatsDto>> GetWeekStats()
         {
+            var userId = GetUserIdFromToken();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound(new { message = "User nicht gefunden" });
@@ -139,22 +140,22 @@ namespace WebAPI.Controllers
                 });
             }
 
-            // Berechne Average
+
             var averageMl = dailyStats.Count > 0 ? (int)dailyStats.Average(d => d.TotalMl) : 0;
 
-            // Berechne Streak
+
             int currentStreak = 0;
             int bestStreak = 0;
             int tempStreak = 0;
 
-            // Current Streak (von heute rückwärts)
+
             for (int i = 6; i >= 0; i--)
             {
                 if (dailyStats[i].GoalReached)
                 {
                     if (i == 6) // Heute
                         currentStreak++;
-                    else if (currentStreak > 0) // Nur weiterzählen wenn Streak aktiv
+                    else if (currentStreak > 0) // Nur weiterz�hlen wenn Streak aktiv
                         currentStreak++;
                     else
                         break; // Streak unterbrochen
@@ -165,7 +166,7 @@ namespace WebAPI.Controllers
                 }
             }
 
-            // Best Streak (alle durchgehen)
+
             foreach (var day in dailyStats)
             {
                 if (day.GoalReached)

@@ -1,4 +1,4 @@
-ï»¿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Models;
 using MauiAbschlussprojekt.Services;
@@ -36,8 +36,6 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private string customAmountInput = string.Empty;
 
-        // Kreis-Umfang: Innenradius = (180 - 14) / 2 = 83px â†’ 2 * Ï€ * 83 â‰ˆ 521
-        // StrokeDashArray im XAML muss ebenfalls 521 sein
         private const double CircleCircumference = 521.0;
 
         public double ProgressDashOffset =>
@@ -54,7 +52,6 @@ namespace MauiAbschlussprojekt.ViewModels
 
         public async Task InitializeAsync()
         {
-            // Frisch vom Server laden statt gecachtes CurrentUser verwenden
             var freshUser = await _apiService.GetUserAsync();
             Username = freshUser?.Username ?? _apiService.CurrentUser?.Username ?? "User";
             GoalMl = freshUser?.DailyWaterGoalMl ?? _apiService.CurrentUser?.DailyWaterGoalMl ?? 2000;
@@ -112,7 +109,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim HinzufÃ¼gen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Hinzufügen: {ex.Message}", "OK");
             }
         }
 
@@ -124,7 +121,7 @@ namespace MauiAbschlussprojekt.ViewModels
 
             if (!int.TryParse(CustomAmountInput, out int amount) || amount <= 0)
             {
-                await Shell.Current.DisplayAlert("Fehler", "Bitte eine gÃ¼ltige Menge eingeben", "OK");
+                await Shell.Current.DisplayAlert("Fehler", "Bitte eine gültige Menge eingeben", "OK");
                 return;
             }
 
@@ -136,8 +133,8 @@ namespace MauiAbschlussprojekt.ViewModels
         private async Task DeleteEntryAsync(WaterEntryDto entry)
         {
             bool confirm = await Shell.Current.DisplayAlert(
-                "LÃ¶schen",
-                $"Eintrag ({entry.AmountMl} ml) wirklich lÃ¶schen?",
+                "Löschen",
+                $"Eintrag ({entry.AmountMl} ml) wirklich löschen?",
                 "Ja", "Nein");
 
             if (!confirm) return;
@@ -154,7 +151,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim LÃ¶schen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Löschen: {ex.Message}", "OK");
             }
         }
 
@@ -171,7 +168,7 @@ namespace MauiAbschlussprojekt.ViewModels
 
             if (!int.TryParse(result, out int newAmount) || newAmount <= 0)
             {
-                await Shell.Current.DisplayAlert("Fehler", "UngÃ¼ltige Menge", "OK");
+                await Shell.Current.DisplayAlert("Fehler", "Ungültige Menge", "OK");
                 return;
             }
 

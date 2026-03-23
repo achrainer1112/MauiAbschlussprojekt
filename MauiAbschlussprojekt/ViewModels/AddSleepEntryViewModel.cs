@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Models;
 using MauiAbschlussprojekt.Services;
@@ -33,22 +33,22 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private string wakeTimeString = string.Empty;
 
-        // ── Initial-Werte für den Code-Behind ──────────────────────────────
-        // Werden nach InitializeAsync() von OnAppearing() ausgelesen
+
+
 
         public int InitialSleepQuality { get; private set; } = 3;
 
-        /// <summary>Index in der Picker-Liste: Fast=0, Normal=1, Medium=2, Long=3</summary>
+
         public int InitialFallAsleepIndex { get; private set; } = 1;
 
         public string InitialDreamText { get; private set; } = string.Empty;
 
-        /// <summary>Index in der Picker-Liste: Positive=0, Neutral=1, Negative=2, Nightmare=3</summary>
+
         public int InitialDreamMoodIndex { get; private set; } = 1;
 
         public string InitialNotes { get; private set; } = string.Empty;
 
-        // ───────────────────────────────────────────────────────────────────
+
 
         public AddSleepEntryViewModel(SleepApiService sleepApiService)
         {
@@ -57,7 +57,7 @@ namespace MauiAbschlussprojekt.ViewModels
 
         public async Task InitializeAsync()
         {
-            // Zeiten aus Query-Parametern parsen (Format "yyyyMMddHHmm" vom QuickLog)
+
             if (!string.IsNullOrEmpty(BedTimeString) && TryParseDateTime(BedTimeString, out var parsedBed))
                 BedTime = parsedBed;
 
@@ -73,13 +73,13 @@ namespace MauiAbschlussprojekt.ViewModels
 
         private bool TryParseDateTime(string value, out DateTime result)
         {
-            // Kompaktes URL-sicheres Format vom QuickLog: "yyyyMMddHHmm"
+
             if (DateTime.TryParseExact(value, "yyyyMMddHHmm",
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None, out result))
                 return true;
 
-            // Fallback für andere Formate
+
             return DateTime.TryParse(value, out result);
         }
 
@@ -124,10 +124,10 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
-        /// <summary>
-        /// Wird vom Code-Behind aufgerufen wenn der Save-Button gedrückt wird.
-        /// Alle Werte kommen direkt aus den UI-Controls (nicht per Binding).
-        /// </summary>
+
+
+
+
         public async Task SaveFromViewAsync(
             DateTime bedTime,
             DateTime wakeTime,

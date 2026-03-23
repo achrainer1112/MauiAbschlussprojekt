@@ -11,7 +11,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12" Spacing="14">
 
-            <!-- Header -->
+  
             <Grid ColumnDefinitions="*,Auto" Padding="4,0">
                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                     <Label Text="{Binding Username, StringFormat='Hallo, {0} 👋'}"
@@ -28,7 +28,7 @@
                 </Frame>
             </Grid>
 
-            <!-- Wasser-Fortschritt Card mit GraphicsView Arc -->
+
             <Border BackgroundColor="White" StrokeThickness="0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="18"/>
@@ -38,18 +38,18 @@
                 </Border.Shadow>
                 <VerticalStackLayout Padding="20" Spacing="12">
 
-                    <!-- GraphicsView Kreis -->
+
                     <Grid WidthRequest="200" HeightRequest="200"
                           HorizontalOptions="Center">
 
-                        <!-- Arc wird vom Code-Behind gezeichnet -->
+
                         <GraphicsView x:Name="WaterCircle"
                                       WidthRequest="200"
                                       HeightRequest="200"
                                       HorizontalOptions="Center"
                                       VerticalOptions="Center"/>
 
-                        <!-- Text im Zentrum -->
+
                         <VerticalStackLayout VerticalOptions="Center"
                                              HorizontalOptions="Center"
                                              Spacing="2">
@@ -72,7 +72,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Schnell hinzufügen -->
+
             <Label Text="Schnell hinzufügen"
                    FontSize="15" FontAttributes="Bold"
                    TextColor="#1A2535" Margin="4,0"/>
@@ -96,7 +96,6 @@
                         CornerRadius="12" FontSize="13" HeightRequest="46"/>
             </Grid>
 
-            <!-- Eigene Menge -->
             <Border BackgroundColor="White" StrokeThickness="0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="14"/>
@@ -122,14 +121,14 @@
                 </Grid>
             </Border>
 
-            <!-- Statistiken -->
+
             <Button Text="📊  Statistiken"
                     Command="{Binding NavigateToStatsCommand}"
                     BackgroundColor="#EBF2FF" TextColor="#1A73E8"
                     FontAttributes="Bold" FontSize="15"
                     CornerRadius="12" HeightRequest="48"/>
 
-            <!-- Heutige Einträge -->
+  
             <Label Text="Heutige Einträge"
                    FontSize="15" FontAttributes="Bold"
                    TextColor="#1A2535" Margin="4,4,4,0"/>

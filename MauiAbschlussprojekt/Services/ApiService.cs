@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Models;
@@ -13,10 +13,8 @@ namespace MauiAbschlussprojekt.Services
             get
             {
 #if ANDROID
-                // Android Emulator: 10.0.2.2 = Host-PC
                 return "http://10.0.2.2:5287/api";
 #else
-                // Windows/iOS: localhost
                 return "http://localhost:5287/api";
 #endif
             }
@@ -42,8 +40,6 @@ namespace MauiAbschlussprojekt.Services
                     new AuthenticationHeaderValue("Bearer", Token);
             }
         }
-
-        // === AUTH ===
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
@@ -131,17 +127,14 @@ namespace MauiAbschlussprojekt.Services
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
-        // === USER ===
+
 
         public async Task<UserDto?> GetUserAsync()
         {
-            if (!CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/user/{CurrentUserId}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/user");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -175,7 +168,7 @@ namespace MauiAbschlussprojekt.Services
                 System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Body = {json}");
 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync($"{BaseUrl}/user/update?userId={CurrentUserId}", content);
+                var response = await _httpClient.PutAsync($"{BaseUrl}/user/update", content);
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 System.Diagnostics.Debug.WriteLine($"UpdateUserAsync: Status = {response.StatusCode}");
@@ -188,7 +181,7 @@ namespace MauiAbschlussprojekt.Services
                     return user;
                 }
 
-                // Fehlermeldung dem User zeigen
+
                 await Shell.Current.DisplayAlert("API Fehler",
                     $"Status: {response.StatusCode}\n{responseContent}", "OK");
                 return null;
@@ -212,7 +205,7 @@ namespace MauiAbschlussprojekt.Services
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{BaseUrl}/user/reminder-settings?userId={CurrentUserId}", content);
+                var response = await _httpClient.PutAsync($"{BaseUrl}/user/reminder-settings", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -230,17 +223,14 @@ namespace MauiAbschlussprojekt.Services
             }
         }
 
-        // === WATER ENTRIES ===
+
 
         public async Task<List<WaterEntryDto>> GetTodayEntriesAsync()
         {
-            if (!CurrentUserId.HasValue)
-                return new List<WaterEntryDto>();
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/water/today/{CurrentUserId}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/water/today");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -267,7 +257,7 @@ namespace MauiAbschlussprojekt.Services
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{BaseUrl}/water/add?userId={CurrentUserId}", content);
+                var response = await _httpClient.PostAsync($"{BaseUrl}/water/add", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -294,7 +284,7 @@ namespace MauiAbschlussprojekt.Services
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{BaseUrl}/water/update?userId={CurrentUserId}", content);
+                var response = await _httpClient.PutAsync($"{BaseUrl}/water/update", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -312,13 +302,10 @@ namespace MauiAbschlussprojekt.Services
 
         public async Task<bool> DeleteWaterAsync(int entryId)
         {
-            if (!CurrentUserId.HasValue)
-                return false;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.DeleteAsync($"{BaseUrl}/water/delete/{entryId}?userId={CurrentUserId}");
+                var response = await _httpClient.DeleteAsync($"{BaseUrl}/water/delete/{entryId}");
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -327,17 +314,14 @@ namespace MauiAbschlussprojekt.Services
             }
         }
 
-        // === STATISTICS ===
+
 
         public async Task<WeekStatsDto?> GetWeekStatsAsync()
         {
-            if (!CurrentUserId.HasValue)
-                return null;
-
             try
             {
                 SetAuthHeader();
-                var response = await _httpClient.GetAsync($"{BaseUrl}/water/stats/week/{CurrentUserId}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/water/stats/week");
 
                 if (response.IsSuccessStatusCode)
                 {

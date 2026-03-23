@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
@@ -31,7 +31,7 @@ namespace Models
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
-        // Water Tracker Settings
+
         [Column("weight_kg")]
         public double? WeightKg { get; set; }
 
@@ -54,7 +54,7 @@ namespace Models
         [Column("reminder_end_hour")]
         public int ReminderEndHour { get; set; } = 22;
 
-        // Sleep Tracker Settings
+
         [Column("target_sleep_hours")]
         public double TargetSleepHours { get; set; } = 8.0;
 
@@ -73,7 +73,7 @@ namespace Models
         [Column("sleep_reminder_enabled")]
         public bool SleepReminderEnabled { get; set; } = false;
 
-        // Navigation Properties
+
         public ICollection<WaterEntry> WaterEntries { get; set; } = new List<WaterEntry>();
         public ICollection<SleepEntry> SleepEntries { get; set; } = new List<SleepEntry>();
     }

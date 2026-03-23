@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MauiAbschlussprojekt
 {
@@ -14,7 +14,7 @@ namespace MauiAbschlussprojekt
             var shell = new AppShell();
             var window = new Window(shell);
 
-            // Nach dem Laden zur LoginPage 
+
             shell.Dispatcher.Dispatch(async () =>
             {
                 await Shell.Current.GoToAsync("//LoginPage");

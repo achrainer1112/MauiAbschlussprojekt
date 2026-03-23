@@ -19,7 +19,6 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private string weightInput = string.Empty;
 
-        // Alias damit XAML mit WeightKg funktioniert
         public string WeightKg
         {
             get => weightInput;
@@ -94,7 +93,7 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private bool isLoading;
 
-        // ActivityLevels UND ActivityLevelOptions – beide Namen funktionieren
+
         public List<ActivityLevelOption> ActivityLevels { get; } = new()
         {
             new ActivityLevelOption { Value = "low",    Display = "Niedrig (30ml/kg)" },
@@ -195,7 +194,7 @@ namespace MauiAbschlussprojekt.ViewModels
         partial void OnWeightInputChanged(string value) => UpdateCalculatedGoal();
         partial void OnSelectedActivityLevelChanged(ActivityLevelOption? value) => UpdateCalculatedGoal();
 
-        // ── SaveProfileCommand (XAML bindet an SaveProfileCommand) ──────────
+
         [RelayCommand]
         private async Task SaveProfile()
         {
@@ -234,7 +233,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
-        // ── SaveReminderSettingsCommand ──────────────────────────────────────
+
         [RelayCommand]
         private async Task SaveReminderSettings()
         {
@@ -252,7 +251,7 @@ namespace MauiAbschlussprojekt.ViewModels
                 var result = await _apiService.UpdateReminderSettingsAsync(request);
 
                 if (ReminderEnabled)
-                    _reminderService.StartPeriodicNotifications(interval, startHour, endHour);
+                    _reminderService.StartPeriodicNotifications(interval, ReminderStartHour, ReminderEndHour);
                 else
                     _reminderService.StopPeriodicNotifications();
 
@@ -271,7 +270,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
-        // ── SaveSleepSettingsCommand ─────────────────────────────────────────
+
         [RelayCommand]
         private async Task SaveSleepSettings()
         {
@@ -307,7 +306,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
-        // ── LogoutCommand ────────────────────────────────────────────────────
+
         [RelayCommand]
         private async Task Logout()
         {

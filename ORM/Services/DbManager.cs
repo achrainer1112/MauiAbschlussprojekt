@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ORM
@@ -9,12 +9,12 @@ namespace ORM
         public DbSet<WaterEntry> WaterEntries { get; set; }
         public DbSet<SleepEntry> SleepEntries { get; set; }
 
-        // Constructor für Dependency Injection (WebAPI)
+
         public DbManager(DbContextOptions<DbManager> options) : base(options)
         {
         }
 
-        // Parameterloser Constructor für Migrations
+
         public DbManager()
         {
         }
@@ -32,7 +32,7 @@ namespace ORM
         {
             base.OnModelCreating(modelBuilder);
 
-            // User: Unique Constraints
+
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
@@ -41,25 +41,25 @@ namespace ORM
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
-            // WaterEntry: Relationship
+
             modelBuilder.Entity<WaterEntry>()
                 .HasOne(w => w.User)
                 .WithMany(u => u.WaterEntries)
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // WaterEntry: Index für bessere Performance
+
             modelBuilder.Entity<WaterEntry>()
                 .HasIndex(w => new { w.UserId, w.LoggedAt });
 
-            // SleepEntry: Relationship
+
             modelBuilder.Entity<SleepEntry>()
                 .HasOne(s => s.User)
                 .WithMany(u => u.SleepEntries)
                 .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // SleepEntry: Index für bessere Performance
+
             modelBuilder.Entity<SleepEntry>()
                 .HasIndex(s => new { s.UserId, s.BedTime });
         }

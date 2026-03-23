@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Models;
 using MauiAbschlussprojekt.Services;
@@ -46,9 +46,17 @@ namespace MauiAbschlussprojekt.ViewModels
         [ObservableProperty]
         private SleepEntryDto? worstNight;
 
+
+        public string GoalMetDaysText => $"{GoalMetDays}/7 Tage";
+        public string ConsistencyScoreText => $"{ConsistencyScore}%";
+        public string AverageFallAsleepText => AverageFallAsleepMinutes > 0
+            ? $"~{(int)AverageFallAsleepMinutes} Min"
+            : "–";
+
         public ObservableCollection<DailySleepStatsDto> WeekStats { get; } = new();
         public ObservableCollection<DreamMoodCount> DreamMoodStats { get; } = new();
-        public ObservableCollection<SleepEntryDto> RecentEntries { get; } = new();  // NEU
+        public ObservableCollection<SleepEntryDto> RecentEntries { get; } = new();
+        public ObservableCollection<SleepEntryDto> DreamEntries { get; } = new();
 
         public SleepStatsViewModel(SleepApiService sleepApiService)
         {
@@ -67,7 +75,6 @@ namespace MauiAbschlussprojekt.ViewModels
 
             try
             {
-                // Wochenstats laden
                 var weekStats = await _sleepApiService.GetWeekStatsAsync();
 
                 if (weekStats != null)
@@ -80,10 +87,10 @@ namespace MauiAbschlussprojekt.ViewModels
                     TargetSleepHours = weekStats.TargetSleepHours;
                     CurrentStreak = weekStats.CurrentStreak;
                     BestStreak = weekStats.BestStreak;
-                    GoalMetDays = weekStats.GoalMetDays;
+                    GoalMetDays = weekStats.GoalMetDays; 
                 }
 
-                // Detaillierte Stats laden (enthält RecentEntries)
+
                 var detailedStats = await _sleepApiService.GetDetailedStatsAsync(30);
 
                 if (detailedStats != null)
@@ -95,10 +102,16 @@ namespace MauiAbschlussprojekt.ViewModels
                     BestNight = detailedStats.BestNight;
                     WorstNight = detailedStats.WorstNight;
 
-                    // RecentEntries befüllen (war vorher komplett vergessen)
                     RecentEntries.Clear();
+                    DreamEntries.Clear();
+
                     foreach (var entry in detailedStats.RecentEntries.OrderByDescending(e => e.BedTime))
+                    {
                         RecentEntries.Add(entry);
+
+                        if (!string.IsNullOrWhiteSpace(entry.DreamText))
+                            DreamEntries.Add(entry);
+                    }
 
                     DreamMoodStats.Clear();
                     foreach (var mood in detailedStats.DreamMoodCounts)
@@ -110,6 +123,11 @@ namespace MauiAbschlussprojekt.ViewModels
                         });
                     }
                 }
+
+
+                OnPropertyChanged(nameof(GoalMetDaysText));
+                OnPropertyChanged(nameof(ConsistencyScoreText));
+                OnPropertyChanged(nameof(AverageFallAsleepText));
             }
             catch (Exception ex)
             {
@@ -119,6 +137,61 @@ namespace MauiAbschlussprojekt.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        [RelayCommand]
+        private async Task DeleteEntryAsync(SleepEntryDto entry)
+        {
+            bool confirm = await Shell.Current.DisplayAlert(
+                "Eintrag löschen",
+                $"Nacht vom {entry.BedTime:dd.MM.yyyy} wirklich löschen?",
+                "Ja, löschen", "Abbrechen");
+
+            if (!confirm) return;
+
+            try
+            {
+                bool success = await _sleepApiService.DeleteSleepEntryAsync(entry.Id);
+                if (success)
+                {
+                    RecentEntries.Remove(entry);
+                    DreamEntries.Remove(entry);
+                    await LoadStatsAsync();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Fehler", "Löschen fehlgeschlagen.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Fehler", $"Fehler beim Löschen: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task EditEntryAsync(SleepEntryDto entry)
+        {
+            await Shell.Current.GoToAsync($"AddSleepEntryPage?entryId={entry.Id}");
+        }
+
+        [RelayCommand]
+        private async Task ViewDreamAsync(SleepEntryDto entry)
+        {
+            if (string.IsNullOrWhiteSpace(entry.DreamText))
+                return;
+
+            string moodEmoji = entry.DreamMood switch
+            {
+                "Positive" => "😊",
+                "Neutral" => "😐",
+                "Negative" => "😟",
+                "Nightmare" => "😱",
+                _ => "💭"
+            };
+
+            string title = $"Traum vom {entry.BedTime:dd.MM.yyyy} {moodEmoji}";
+            await Shell.Current.DisplayAlert(title, entry.DreamText, "Schließen");
         }
 
         [RelayCommand]

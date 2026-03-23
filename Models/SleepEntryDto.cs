@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models
 {
-    // Sleep Entry DTOs
+
     public class SleepEntryDto
     {
         public int Id { get; set; }
@@ -45,7 +45,7 @@ namespace Models
         public string? Notes { get; set; }
     }
 
-    // Sleep Statistics
+
     public class SleepStatsDto
     {
         public double AverageSleepHours { get; set; }
@@ -80,15 +80,15 @@ namespace Models
         public bool GoalMet { get; set; }
         public string? Notes { get; set; }
 
-        // Berechneter Fortschrittswert für ProgressBar (0.0 – 1.0)
+
         public double ProgressValue => TargetSleepHours > 0
             ? Math.Min(TotalSleepHours / TargetSleepHours, 1.0)
             : 0.0;
 
-        // Anzeigetext für Ziel-Status
-        public string GoalStatusText => GoalMet ? "✅ Ziel erreicht" : (TotalSleepHours > 0 ? "❌ Ziel nicht erreicht" : "– Kein Eintrag");
 
-        // Farbe für ProgressBar
+        public string GoalStatusText => GoalMet ? "? Ziel erreicht" : (TotalSleepHours > 0 ? "? Ziel nicht erreicht" : "� Kein Eintrag");
+
+
         public string ProgressColor => GoalMet ? "#27AE60" : (TotalSleepHours > 0 ? "#E67E22" : "#BDC3C7");
     }
 

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using MauiAbschlussprojekt.Services;
 using MauiAbschlussprojekt.ViewModels;
 using MauiAbschlussprojekt.Views;
@@ -25,12 +25,12 @@ namespace MauiAbschlussprojekt
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // ── Services (alle Singleton – leben für die gesamte App-Laufzeit) ──
+
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<SleepApiService>();
             builder.Services.AddSingleton<IReminderService, ReminderService>();
 
-            // ── Views ──────────────────────────────────────────────────────────
+
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<MainPage>();
@@ -40,7 +40,7 @@ namespace MauiAbschlussprojekt
             builder.Services.AddTransient<SleepStatsPage>();
             builder.Services.AddTransient<AddSleepEntryPage>();
 
-            // ── ViewModels ─────────────────────────────────────────────────────
+
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<MainViewModel>();
@@ -49,7 +49,7 @@ namespace MauiAbschlussprojekt
             builder.Services.AddTransient<SleepStatsViewModel>();
             builder.Services.AddTransient<AddSleepEntryViewModel>();
 
-            // Singleton: QuickBedTime muss über Navigation hinweg erhalten bleiben
+
             builder.Services.AddSingleton<SleepTrackerViewModel>();
 
 #if DEBUG
