@@ -87,7 +87,7 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="12"/>
                 </Border.StrokeShape>
-                <Button Text="🔵  Mit Google anmelden"
+                <Button Text="Mit Google anmelden"
                         Command="{Binding LoginWithGoogleCommand}"
                         BackgroundColor="Transparent"
                         TextColor="#E8EDF2"

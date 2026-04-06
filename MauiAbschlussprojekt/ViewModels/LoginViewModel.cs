@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Models;
 using MauiAbschlussprojekt.Services;
+using Models;
 
 namespace MauiAbschlussprojekt.ViewModels
 {
@@ -9,9 +9,6 @@ namespace MauiAbschlussprojekt.ViewModels
     {
         private readonly ApiService _apiService;
         private readonly IReminderService _reminderService;
-
-        private const string AndroidClientId =
-            "247683480444-n7gvs0lidng887pamkat36ds6mkot29f.apps.googleusercontent.com";
 
         private const string WindowsClientId =
             "247683480444-2lah8tu27r8tjjda7kktsonugp6vq1q2.apps.googleusercontent.com";
@@ -84,13 +81,9 @@ namespace MauiAbschlussprojekt.ViewModels
 
             try
             {
-#if ANDROID
-                var clientId = WindowsClientId; // Web Client ID für beide!
-                var redirectUri = "http://localhost";
-#else
-                var clientId    = WindowsClientId;
-                var redirectUri = "http://localhost:5287/api/auth/google-callback";
-#endif
+                var clientId = WindowsClientId;
+                var redirectUri = "http://localhost:5001/callback";
+
                 var codeVerifier = GenerateCodeVerifier();
                 var codeChallenge = GenerateCodeChallenge(codeVerifier);
 
@@ -103,23 +96,51 @@ namespace MauiAbschlussprojekt.ViewModels
                     "&code_challenge_method=S256" +
                     $"&code_challenge={codeChallenge}");
 
-                var result = await WebAuthenticator.Default.AuthenticateAsync(
-                    new WebAuthenticatorOptions
-                    {
-                        Url = authUrl,
-                        CallbackUrl = new Uri(redirectUri),
-                        PrefersEphemeralWebBrowserSession = true
-                    });
+                // Listener VOR Browser starten
+                var codeTask = StartLocalListenerAsync();
 
-                if (result.Properties.TryGetValue("code", out var code)
-                    && !string.IsNullOrEmpty(code))
+                await Browser.Default.OpenAsync(authUrl, BrowserLaunchMode.SystemPreferred);
+
+                // Warten bis Code ankommt
+                var code = await codeTask;
+
+                if (!string.IsNullOrEmpty(code))
                 {
-                    var response = await _apiService.GoogleExchangeAsync(code, redirectUri, codeVerifier);
+                    var response = await _apiService.GoogleExchangeAsync(
+                        code, redirectUri, codeVerifier);
 
                     if (response.Success)
-                        await HandleSuccessfulLogin(response);
+                    {
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+#if ANDROID
+                            if (response.User?.ReminderEnabled == true)
+                            {
+                                await _reminderService.RequestPermissionAsync();
+                                _reminderService.StartPeriodicNotifications(
+                                    response.User.ReminderIntervalMinutes,
+                                    response.User.ReminderStartHour,
+                                    response.User.ReminderEndHour);
+                            }
+
+                            if (response.User?.SleepReminderEnabled == true)
+                            {
+                                _reminderService.ScheduleDailySleepReminder(
+                                    response.User.TargetBedTimeHour,
+                                    response.User.TargetBedTimeMinute);
+                            }
+
+                            // Flag setzen — Navigation passiert wenn User Browser schließt
+                            MauiAbschlussprojekt.MainActivity.ShouldNavigateToMain = true;
+#else
+                            await HandleSuccessfulLogin(response);
+#endif
+                        });
+                    }
                     else
+                    {
                         ErrorMessage = response.Message ?? "Google Login fehlgeschlagen.";
+                    }
                 }
                 else
                 {
@@ -128,7 +149,7 @@ namespace MauiAbschlussprojekt.ViewModels
             }
             catch (TaskCanceledException)
             {
-                // Nutzer hat Browser geschlossen — kein Fehler
+                // Nutzer hat abgebrochen
             }
             catch (Exception ex)
             {
@@ -137,6 +158,48 @@ namespace MauiAbschlussprojekt.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        // ── Lokaler HTTP Listener ─────────────────────────────────────────
+
+        private static async Task<string?> StartLocalListenerAsync()
+        {
+            try
+            {
+                var listener = new System.Net.HttpListener();
+                listener.Prefixes.Add("http://localhost:5001/callback/");
+                listener.Start();
+
+                var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+
+                var context = await Task.Run(
+                    () => listener.GetContextAsync(), cts.Token);
+
+                var url = context.Request.Url?.ToString() ?? "";
+
+                var html = "<html><meta charset='utf-8'><body>" +
+                           "<h2>Login erfolgreich! Kehre zur App zur\u00fcck.</h2>" +
+                           "<script>window.close();</script>" +
+                           "</body></html>";
+                var buffer = System.Text.Encoding.UTF8.GetBytes(html);
+                context.Response.ContentLength64 = buffer.Length;
+                context.Response.ContentType = "text/html; charset=utf-8";
+                await context.Response.OutputStream.WriteAsync(buffer);
+                context.Response.OutputStream.Close();
+                listener.Stop();
+
+                var uri = new Uri(url);
+                var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                var code = query["code"];
+
+                System.Diagnostics.Debug.WriteLine($"Got code: {code}");
+                return code;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Listener error: {ex.Message}");
+                return null;
             }
         }
 
@@ -189,54 +252,6 @@ namespace MauiAbschlussprojekt.ViewModels
                 .TrimEnd('=')
                 .Replace('+', '-')
                 .Replace('/', '_');
-        }
-
-        private static async Task<string?> ExchangeCodeForTokenAsync(
-    string code,
-    string redirectUri,
-    string codeVerifier,
-    string clientId)
-        {
-            try
-            {
-                var parameters = new Dictionary<string, string>
-        {
-            { "code",          code                  },
-            { "client_id",     clientId              },
-            { "redirect_uri",  redirectUri           },
-            { "grant_type",    "authorization_code"  },
-            { "code_verifier", codeVerifier          }
-        };
-
-                var httpClient = new HttpClient();
-                var response = await httpClient.PostAsync(
-                    "https://oauth2.googleapis.com/token",
-                    new FormUrlEncodedContent(parameters));
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                // Debug — zeigt was Google zurückgibt
-                System.Diagnostics.Debug.WriteLine($"Token Response: {json}");
-
-                var tokenResponse = Newtonsoft.Json.JsonConvert
-                    .DeserializeObject<Dictionary<string, string>>(json);
-
-                if (tokenResponse != null &&
-                    tokenResponse.TryGetValue("id_token", out var idToken))
-                    return idToken;
-
-                // Zeige Fehler aus Google Response
-                if (tokenResponse != null &&
-                    tokenResponse.TryGetValue("error", out var error))
-                    System.Diagnostics.Debug.WriteLine($"Google Error: {error}");
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Exchange Exception: {ex.Message}");
-                return null;
-            }
         }
     }
 }
