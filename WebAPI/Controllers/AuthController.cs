@@ -246,33 +246,73 @@ namespace WebAPI.Controllers
         {
             try
             {
+                // Validierung
+                if (string.IsNullOrWhiteSpace(request.Code))
+                    return BadRequest(new AuthResponse
+                    {
+                        Success = false,
+                        Message = "Authorization Code ist erforderlich"
+                    });
+
+                var clientId = _configuration["Google:ClientId"];
+                var clientSecret = _configuration["Google:ClientSecret"];
+
+                if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+                    return StatusCode(500, new AuthResponse
+                    {
+                        Success = false,
+                        Message = "Google-Konfiguration ist nicht vollständig"
+                    });
+
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] Code: {request.Code}");
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] RedirectUri: {request.RedirectUri}");
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] ClientId: {clientId}");
+
                 // Token-Austausch serverseitig mit client_secret
                 var parameters = new Dictionary<string, string>
-        {
-            { "code",          request.Code         },
-            { "client_id",     _configuration["Google:ClientId"]!     },
-            { "client_secret", _configuration["Google:ClientSecret"]! },
-            { "redirect_uri",  request.RedirectUri  },
-            { "grant_type",    "authorization_code"  },
-            { "code_verifier", request.CodeVerifier  }
-        };
+                {
+                    { "code",          request.Code         },
+                    { "client_id",     clientId             },
+                    { "client_secret", clientSecret         },
+                    { "redirect_uri",  request.RedirectUri  },
+                    { "grant_type",    "authorization_code" },
+                    { "code_verifier", request.CodeVerifier }
+                };
 
                 var httpClient = new HttpClient();
+
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] Sending request with redirect_uri: {request.RedirectUri}");
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] Parameters: code={request.Code}, client_id={clientId}, grant_type=authorization_code");
+
                 var tokenResponse = await httpClient.PostAsync(
                     "https://oauth2.googleapis.com/token",
                     new FormUrlEncodedContent(parameters));
 
                 var json = await tokenResponse.Content.ReadAsStringAsync();
+
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] Response Status: {tokenResponse.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"[Google Exchange] Response: {json}");
+
                 var tokenData = Newtonsoft.Json.JsonConvert
                     .DeserializeObject<Dictionary<string, string>>(json);
 
                 if (tokenData == null ||
                     !tokenData.TryGetValue("id_token", out var idToken))
                 {
+                    var errorMsg = json ?? "Unknown error";
+                    if (tokenData?.TryGetValue("error", out var error) == true)
+                    {
+                        errorMsg = $"Error: {error}";
+                        if (tokenData.TryGetValue("error_description", out var desc))
+                            errorMsg += $" - {desc}";
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"[Google Exchange] Error: {errorMsg}");
+
                     return BadRequest(new AuthResponse
                     {
                         Success = false,
-                        Message = $"Token-Austausch fehlgeschlagen: {json}"
+                        Message = $"Token-Austausch fehlgeschlagen: {errorMsg}"
                     });
                 }
 

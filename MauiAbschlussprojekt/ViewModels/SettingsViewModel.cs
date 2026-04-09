@@ -29,6 +29,12 @@ namespace MauiAbschlussprojekt.ViewModels
         private string customGoalInput = string.Empty;
 
         [ObservableProperty]
+        private bool hasManualGoal = false;  // Trackt ob Benutzer manuell einen Wert eingegeben hat
+
+        [ObservableProperty]
+        private int calculatedGoalValue = 0;
+
+        [ObservableProperty]
         private ActivityLevelOption? selectedActivityLevel;
 
         [ObservableProperty]
@@ -147,6 +153,9 @@ namespace MauiAbschlussprojekt.ViewModels
                     WeightInput = user.WeightKg?.ToString() ?? string.Empty;
                     CustomGoalInput = user.DailyWaterGoalMl?.ToString() ?? string.Empty;
 
+                    // Setze HasManualGoal basierend auf ob ein Wert gespeichert ist
+                    HasManualGoal = !string.IsNullOrWhiteSpace(CustomGoalInput);
+
                     if (!string.IsNullOrEmpty(user.ActivityLevel))
                         SelectedActivityLevel = ActivityLevels.FirstOrDefault(a => a.Value == user.ActivityLevel);
 
@@ -182,17 +191,26 @@ namespace MauiAbschlussprojekt.ViewModels
                     "high" => 40,
                     _ => 33
                 };
-                CalculatedGoalText = $"Empfohlenes Tagesziel: {(int)(weight * multiplier)} ml";
+                int calculatedValue = (int)(weight * multiplier);
+                CalculatedGoalValue = calculatedValue;
+                CalculatedGoalText = $"Empfohlenes Tagesziel: {calculatedValue} ml";
                 ShowCalculatedGoal = true;
             }
             else
             {
+                CalculatedGoalValue = 0;
                 ShowCalculatedGoal = false;
             }
         }
 
         partial void OnWeightInputChanged(string value) => UpdateCalculatedGoal();
         partial void OnSelectedActivityLevelChanged(ActivityLevelOption? value) => UpdateCalculatedGoal();
+
+        partial void OnCustomGoalInputChanged(string value)
+        {
+            // Tracke ob Benutzer manuell einen Wert eingegeben hat
+            HasManualGoal = !string.IsNullOrWhiteSpace(value);
+        }
 
 
         [RelayCommand]
@@ -201,12 +219,20 @@ namespace MauiAbschlussprojekt.ViewModels
             IsLoading = true;
             try
             {
+                // Wenn CustomGoalInput leer ist, wird null gesendet → Server berechnet neu
+                // Wenn CustomGoalInput gesetzt ist, wird dieser Wert gesendet
+                int? dailyWaterGoal = null;
+                if (int.TryParse(CustomGoalInput, out int g) && g > 0)
+                {
+                    dailyWaterGoal = g;
+                }
+
                 var request = new UpdateUserRequest
                 {
                     Username = string.IsNullOrWhiteSpace(Username) ? null : Username,
                     WeightKg = double.TryParse(WeightInput, out double w) ? w : null,
                     ActivityLevel = SelectedActivityLevel?.Value,
-                    DailyWaterGoalMl = int.TryParse(CustomGoalInput, out int g) && g > 0 ? g : null
+                    DailyWaterGoalMl = dailyWaterGoal
                 };
 
                 var result = await _apiService.UpdateUserAsync(request);
@@ -233,6 +259,18 @@ namespace MauiAbschlussprojekt.ViewModels
             }
         }
 
+        [RelayCommand]
+        private async Task UseCalculatedGoal()
+        {
+            // Setze den berechneten Wert als manuellen Wert
+            if (CalculatedGoalValue > 0)
+            {
+                CustomGoalInput = CalculatedGoalValue.ToString();
+                HasManualGoal = true;  // Flag setzen
+                await SaveProfile();
+            }
+        }
+
 
         [RelayCommand]
         private async Task SaveReminderSettings()
@@ -240,6 +278,28 @@ namespace MauiAbschlussprojekt.ViewModels
             IsLoading = true;
             try
             {
+                // 1. Speichere zuerst das Tagesziel
+                int? dailyWaterGoal = null;
+                if (int.TryParse(CustomGoalInput, out int g) && g > 0)
+                {
+                    dailyWaterGoal = g;
+                }
+
+                var profileRequest = new UpdateUserRequest
+                {
+                    DailyWaterGoalMl = dailyWaterGoal
+                };
+
+                var profileResult = await _apiService.UpdateUserAsync(profileRequest);
+
+                if (profileResult == null)
+                {
+                    await Shell.Current.DisplayAlert("Fehler", "Tagesziel speichern fehlgeschlagen.", "OK");
+                    IsLoading = false;
+                    return;
+                }
+
+                // 2. Speichere die Erinnerungseinstellungen
                 var request = new UpdateReminderRequest
                 {
                     ReminderEnabled = ReminderEnabled,
@@ -256,9 +316,13 @@ namespace MauiAbschlussprojekt.ViewModels
                     _reminderService.StopPeriodicNotifications();
 
                 if (result != null)
+                {
                     await Shell.Current.DisplayAlert("Erfolg", "Wasser-Einstellungen gespeichert ✓", "OK");
+                }
                 else
+                {
                     await Shell.Current.DisplayAlert("Fehler", "Speichern fehlgeschlagen.", "OK");
+                }
             }
             catch (Exception ex)
             {

@@ -383,9 +383,25 @@ namespace MauiAbschlussprojekt.Services
                 var json = JsonConvert.SerializeObject(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync] Posting to {BaseUrl}/auth/google-exchange");
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync] Code: {code}");
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync] RedirectUri: {redirectUri}");
+
                 var response = await _httpClient.PostAsync(
                     $"{BaseUrl}/auth/google-exchange", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
+
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync] Response Status: {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync] Response Content: {responseContent}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new AuthResponse
+                    {
+                        Success = false,
+                        Message = $"Server error ({response.StatusCode}): {responseContent}"
+                    };
+                }
 
                 var result = JsonConvert.DeserializeObject<AuthResponse>(responseContent);
 
@@ -396,11 +412,13 @@ namespace MauiAbschlussprojekt.Services
                     CurrentUser = result.User;
                 }
 
-                return result ?? new AuthResponse { Success = false };
+                return result ?? new AuthResponse { Success = false, Message = "Ungültige Serverantwort" };
             }
             catch (Exception ex)
             {
-                return new AuthResponse { Success = false, Message = ex.Message };
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync Exception] {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[GoogleExchangeAsync Exception] {ex.StackTrace}");
+                return new AuthResponse { Success = false, Message = $"Fehler: {ex.Message}" };
             }
         }
     }

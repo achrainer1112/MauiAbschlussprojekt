@@ -96,16 +96,17 @@ namespace MauiAbschlussprojekt.ViewModels
                     "&code_challenge_method=S256" +
                     $"&code_challenge={codeChallenge}");
 
-                // Listener VOR Browser starten
+                System.Diagnostics.Debug.WriteLine($"[Google OAuth] Auth URL: {authUrl}");
+
+                // Verwende HttpListener auf BEIDEN Plattformen
                 var codeTask = StartLocalListenerAsync();
-
                 await Browser.Default.OpenAsync(authUrl, BrowserLaunchMode.SystemPreferred);
-
-                // Warten bis Code ankommt
                 var code = await codeTask;
 
                 if (!string.IsNullOrEmpty(code))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[Google OAuth] Code erhalten: {code}");
+
                     var response = await _apiService.GoogleExchangeAsync(
                         code, redirectUri, codeVerifier);
 
@@ -129,12 +130,8 @@ namespace MauiAbschlussprojekt.ViewModels
                                     response.User.TargetBedTimeHour,
                                     response.User.TargetBedTimeMinute);
                             }
-
-                            // Flag setzen — Navigation passiert wenn User Browser schließt
-                            MauiAbschlussprojekt.MainActivity.ShouldNavigateToMain = true;
-#else
-                            await HandleSuccessfulLogin(response);
 #endif
+                            await HandleSuccessfulLogin(response);
                         });
                     }
                     else
@@ -149,11 +146,12 @@ namespace MauiAbschlussprojekt.ViewModels
             }
             catch (TaskCanceledException)
             {
-                // Nutzer hat abgebrochen
+                ErrorMessage = "Authentifizierung abgebrochen.";
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Fehler: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"[LoginWithGoogle Exception] {ex}");
             }
             finally
             {
@@ -165,41 +163,70 @@ namespace MauiAbschlussprojekt.ViewModels
 
         private static async Task<string?> StartLocalListenerAsync()
         {
+            System.Net.HttpListener? listener = null;
             try
             {
-                var listener = new System.Net.HttpListener();
+                listener = new System.Net.HttpListener();
                 listener.Prefixes.Add("http://localhost:5001/callback/");
                 listener.Start();
 
-                var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+                var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+
+                System.Diagnostics.Debug.WriteLine("[HttpListener] Started listening on http://localhost:5001/callback/");
 
                 var context = await Task.Run(
                     () => listener.GetContextAsync(), cts.Token);
 
                 var url = context.Request.Url?.ToString() ?? "";
+                System.Diagnostics.Debug.WriteLine($"[HttpListener] Received request: {url}");
 
-                var html = "<html><meta charset='utf-8'><body>" +
-                           "<h2>Login erfolgreich! Kehre zur App zur\u00fcck.</h2>" +
-                           "<script>window.close();</script>" +
-                           "</body></html>";
-                var buffer = System.Text.Encoding.UTF8.GetBytes(html);
-                context.Response.ContentLength64 = buffer.Length;
-                context.Response.ContentType = "text/html; charset=utf-8";
-                await context.Response.OutputStream.WriteAsync(buffer);
-                context.Response.OutputStream.Close();
-                listener.Stop();
+                try
+                {
+                    var html = "<html><meta charset='utf-8'><body>" +
+                               "<h2>Login erfolgreich! Kehre zur App zurück.</h2>" +
+                               "<script>window.close();</script>" +
+                               "</body></html>";
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(html);
+                    context.Response.ContentLength64 = buffer.Length;
+                    context.Response.ContentType = "text/html; charset=utf-8";
+                    await context.Response.OutputStream.WriteAsync(buffer);
+                    context.Response.OutputStream.Close();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[HttpListener] Error sending response: {ex.Message}");
+                }
 
                 var uri = new Uri(url);
                 var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
                 var code = query["code"];
 
-                System.Diagnostics.Debug.WriteLine($"Got code: {code}");
+                System.Diagnostics.Debug.WriteLine($"[HttpListener] Extracted code: {code}");
                 return code;
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[HttpListener] Timeout - kein Code erhalten (5 Minuten)");
+                return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Listener error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[HttpListener] Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[HttpListener] StackTrace: {ex.StackTrace}");
                 return null;
+            }
+            finally
+            {
+                try
+                {
+                    listener?.Stop();
+                    listener?.Close();
+                    System.Diagnostics.Debug.WriteLine("[HttpListener] Listener stopped and closed");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[HttpListener] Error closing: {ex.Message}");
+                }
             }
         }
 

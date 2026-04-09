@@ -101,14 +101,30 @@
                 <VerticalStackLayout Spacing="14">
 
                     <Label Style="{StaticResource FieldLabel}" Text="Tagesziel (ml)"/>
-                    <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-                        <Entry Text="{Binding CustomGoalInput}"
-                               Keyboard="Numeric" FontSize="15" TextColor="#1A2535"
-                               BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
-                    </Border>
+                    <VerticalStackLayout Spacing="10">
+                        <Border StrokeThickness="1" Stroke="#E8EDF2" BackgroundColor="#F8FAFC">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding CustomGoalInput}"
+                                   Keyboard="Numeric" FontSize="15" TextColor="#1A2535"
+                                   BackgroundColor="Transparent" Margin="12,0" HeightRequest="48"/>
+                        </Border>
+
+                        <!-- Info über berechneten Wert + Übernehmen Button -->
+                        <!-- Nur sichtbar wenn: 1) ShowCalculatedGoal=true UND 2) CustomGoalInput ist leer -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" 
+                              IsVisible="{Binding ShowCalculatedGoal}">
+                            <Label Grid.Column="0" Text="{Binding CalculatedGoalText}"
+                                   FontSize="12" TextColor="#1A73E8" FontAttributes="Bold" VerticalOptions="Center"/>
+                            <Button Grid.Column="1" Text="Übernehmen"
+                                    Command="{Binding UseCalculatedGoalCommand}"
+                                    BackgroundColor="#1A73E8" TextColor="White"
+                                    FontAttributes="Bold" CornerRadius="8" HeightRequest="36"
+                                    Padding="12,8" FontSize="12"
+                                    IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                        </Grid>
+                    </VerticalStackLayout>
 
                     <!-- Trink-Erinnerungen Toggle -->
                     <Grid ColumnDefinitions="*,Auto">
